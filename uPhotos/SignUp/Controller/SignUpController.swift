@@ -87,7 +87,7 @@ class SignUpController: UIViewController {
         btn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 25)
         btn.titleLabel?.textAlignment = .left
         btn.tintColor = .white
-        //btn.addTarget(self, action: #selector(SignUp), for: .touchUpInside)
+        btn.addTarget(self, action: #selector(SignUp), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -251,6 +251,47 @@ class SignUpController: UIViewController {
             SignInBtn.topAnchor.constraint(equalTo: OrLbl.bottomAnchor, constant: 5),
             SignInBtn.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5),
         ])
+    }
+    
+    @objc fileprivate func SignUp() {
+        
+        //capture safe mode the data
+        guard let firstname = FirstnameTxt.text else {return}
+        guard let lastname = LastnameTxt.text else {return}
+        guard let email = EmailTxt.text else {return}
+        guard let username = UsernameTxt.text else {return}
+        guard let password = PasswordTxt.text else {return}
+        
+        if firstname.isEmpty || lastname.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty {
+            
+            //keep the process in background
+            DispatchQueue.main.async {
+                
+                //Contiene el mensaje de error
+                let mg = UILabel()
+                mg.textColor = UIColor.white
+                mg.textAlignment = .center
+                mg.font = UIFont(name: "Avenir Next", size: 17)
+                mg.text = "Oops something went wrong!"
+                mg.numberOfLines = 0
+                mg.layer.zPosition = 1
+                mg.clipsToBounds = true
+                mg.backgroundColor = UIColor(red: 255, green: 0, blue: 0, alpha: 0.6)
+                mg.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height / 8)
+                
+                //Se agrega a la vista
+                self.view.addSubview(mg)
+                
+                //Proceso de animacion
+                UIView.animate(withDuration: 1.5, delay: 3, options: .curveEaseOut, animations: {
+                    mg.alpha = 0.0
+                }, completion: { (_) in
+                    mg.removeFromSuperview()
+                })
+            }
+        } else {
+            
+        }
     }
     
     //Create backgroundColor grandient
