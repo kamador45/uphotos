@@ -96,6 +96,9 @@ class SignInController: UIViewController, UITextFieldDelegate {
         //Define background color
         view.backgroundColor = UIColor.red.withAlphaComponent(0.6)
         
+        //hidden navigationbar
+        navigationController?.isNavigationBarHidden = true
+        
         //define delegate
         UsernameTxt.delegate = self
         UsernameTxt.tag = 0
@@ -200,13 +203,122 @@ class SignInController: UIViewController, UITextFieldDelegate {
     
     //Sign In user
     @objc fileprivate func SignIn() {
-        print("Hola")
+        
+        guard let username = UsernameTxt.text else {return}
+        guard let password = PasswordTxt.text else {return}
+        
+        if username.isEmpty || password.isEmpty {
+            //keep the process in background
+            DispatchQueue.main.async {
+                
+                //Contiene el mensaje de error
+                let mg = UILabel()
+                mg.textColor = UIColor.white
+                mg.textAlignment = .center
+                mg.font = UIFont(name: "Avenir Next", size: 17)
+                mg.text = "Oops something went wrong!"
+                mg.numberOfLines = 0
+                mg.layer.zPosition = 1
+                mg.clipsToBounds = true
+                mg.backgroundColor = UIColor(red: 255, green: 0, blue: 0, alpha: 0.6)
+                mg.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height / 8)
+                
+                //Se agrega a la vista
+                self.view.addSubview(mg)
+                
+                //Proceso de animacion
+                UIView.animate(withDuration: 1.5, delay: 3, options: .curveEaseOut, animations: {
+                    mg.alpha = 0.0
+                }, completion: { (_) in
+                    mg.removeFromSuperview()
+                })
+            }
+        } else {
+            //Process for to Sign Up
+            guard let url = URL(string: "http://localhost:1337/sign_in/") else { return }
+            
+            //start request
+            let request = NSMutableURLRequest(url: url)
+            
+            //define method
+            request.httpMethod = "POST"
+            
+            //define body
+            let body = "username=\(username)&password=\(password)"
+            request.httpBody = body.data(using: .utf8)
+            
+            //start session
+            let session = URLSession.shared
+            let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
+                
+                //capture data send from server
+                guard let data = data else {return}
+                
+                //detect some errors
+                if let err = error {
+                    print("Something go mad ==> \(err)")
+                } else {
+                    
+                    do {
+                        
+                        //serialization
+                        let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
+                        
+                        //store all json data in model 
+                        guard let parseJSON = UserModel(dict: json as! [String : Any]) else {
+                            print("Error to parse data")
+                            return
+                        }
+                        
+                        //access to object
+                        let id = parseJSON.id
+                        
+                        //detect if exist some data
+                        if id != nil {
+                            print("I found this data ==>\(id)")
+                            
+                            //keep process on background
+                            DispatchQueue.main.async {
+                                
+                                //encode objects receive from server
+                                UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+                                
+                                //convert data to object
+                                guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
+                                
+                                //decode and insert all data in model
+                                guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
+                                
+                                //Store all info in global var
+                                userData = userInfo
+                            }
+                            
+                            DispatchQueue.main.async {
+                                guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
+                                mainTabBarController.SetupController()
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                            
+                        } else {
+                            
+                        }
+                        
+                    } catch let errorParse {
+                        print("error to parse JSON ==> \(errorParse)")
+                    }
+                }
+            }
+            task.resume()
+        }
     }
     
-    //Load Sign Up View
+    
+    //load SignUp view
     @objc fileprivate func SignUp() {
-        print("Hola :)")
+        let controller = SignUpController()
+        navigationController?.pushViewController(controller, animated: true)
     }
+    
     
     //Active return button
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

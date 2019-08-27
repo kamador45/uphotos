@@ -12,6 +12,8 @@ import UIKit
 
 class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    var usersInfo: UserModel?
+    
     //header id
     let header_id = "header"
     let celdaId = "CeldaId"
@@ -24,13 +26,16 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         collectionView.backgroundColor = .white
         
         //settings navbar title
-        navigationItem.title = "μPhotos"
+        navigationItem.title = userData?.username
         
         //register view on controller
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: header_id)
         
         //register cell
         collectionView.register(PostPicsCell.self, forCellWithReuseIdentifier: celdaId)
+        
+        //call functions
+        BtnLogOut()
     }
     
     //Header settings
@@ -72,5 +77,31 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     //define size header
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: view.frame.height, height: 500)
+    }
+    
+    //Add icon to close session btn
+    fileprivate func BtnLogOut() {
+        let img = UIImage(named: "logout.png")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: img?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(LogoutSession))
+    }
+    
+    @objc fileprivate func LogoutSession() {
+        
+        //create alert controller
+        let alertController = UIAlertController(title: "", message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        //add action to alert
+        alertController.addAction(UIAlertAction(title: "Logout", style: .destructive, handler: { (_) in
+            do {
+                let loginController = SignInController()
+                let navController = UINavigationController(rootViewController: loginController)
+                self.present(navController, animated: true, completion: nil)
+            } catch let Error {
+                print("Oops something go bad", Error)
+            }
+        }))
+        
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
     }
 }

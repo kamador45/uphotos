@@ -10,6 +10,7 @@
 		1F54FF81231454E900678823 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F54FF80231454E900678823 /* Assets.xcassets */; };
 		1F54FF832314A9FA00678823 /* PostPicsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F54FF822314A9FA00678823 /* PostPicsCell.swift */; };
 		1F54FF852314ADB400678823 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F54FF842314ADB400678823 /* UserModel.swift */; };
+		1F54FF882314C8AE00678823 /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F54FF872314C8AE00678823 /* UserResponse.swift */; };
 		1FEE0EAB2311EB9300EE1E29 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE0EAA2311EB9300EE1E29 /* MainTabBarController.swift */; };
 		1FEE0EB22311F9A800EE1E29 /* HomeFeedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE0EB12311F9A800EE1E29 /* HomeFeedController.swift */; };
 		1FEE0EB42311F9FB00EE1E29 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE0EB32311F9FB00EE1E29 /* SearchController.swift */; };
@@ -30,6 +31,7 @@
 		1F54FF80231454E900678823 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F54FF822314A9FA00678823 /* PostPicsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPicsCell.swift; sourceTree = "<group>"; };
 		1F54FF842314ADB400678823 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		1F54FF872314C8AE00678823 /* UserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResponse.swift; sourceTree = "<group>"; };
 		1FEE0EAA2311EB9300EE1E29 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		1FEE0EB12311F9A800EE1E29 /* HomeFeedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedController.swift; sourceTree = "<group>"; };
 		1FEE0EB32311F9FB00EE1E29 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
@@ -59,6 +61,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F54FF862314C89D00678823 /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				1F54FF872314C8AE00678823 /* UserResponse.swift */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
 		1FEE0EA92311EB7500EE1E29 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +164,7 @@
 		1FEE0EC22312057400EE1E29 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1F54FF862314C89D00678823 /* Response */,
 				1F54FF842314ADB400678823 /* UserModel.swift */,
 			);
 			path = Model;
@@ -302,6 +313,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FEE0EB22311F9A800EE1E29 /* HomeFeedController.swift in Sources */,
+				1F54FF882314C8AE00678823 /* UserResponse.swift in Sources */,
 				1FEE0EB42311F9FB00EE1E29 /* SearchController.swift in Sources */,
 				1FF010402310A1620072006D /* SignInController.swift in Sources */,
 				1FF0103E2310A1620072006D /* AppDelegate.swift in Sources */,

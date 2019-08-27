@@ -8,6 +8,9 @@
 
 import UIKit
 
+//manage data with global var
+var userData:UserModel?
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -18,8 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         //Define root controller
-        let controller = SignUpController()
-        window?.rootViewController = controller
+        window = UIWindow()
+        window?.rootViewController = MainTabBarController()
         
         return true
     }

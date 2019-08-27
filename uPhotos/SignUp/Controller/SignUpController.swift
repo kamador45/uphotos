@@ -108,7 +108,7 @@ class SignUpController: UIViewController {
         btn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 25)
         btn.titleLabel?.textAlignment = .left
         btn.tintColor = .white
-        //btn.addTarget(self, action: #selector(SignIn), for: .touchUpInside)
+        btn.addTarget(self, action: #selector(SignIn), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -126,7 +126,12 @@ class SignUpController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //define background
         view.backgroundColor = .red
+        
+        //hidden navigationbar
+        navigationController?.isNavigationBarHidden = true
         
         //execute all functions
         CreateGradienteBackground()
@@ -255,16 +260,15 @@ class SignUpController: UIViewController {
     
     @objc fileprivate func SignUp() {
         
-        //capture safe mode the data
-        guard let firstname = FirstnameTxt.text else {return}
-        guard let lastname = LastnameTxt.text else {return}
-        guard let email = EmailTxt.text else {return}
-        guard let username = UsernameTxt.text else {return}
-        guard let password = PasswordTxt.text else {return}
+        //Count number of chars for to enable the button
+        guard let firstname = FirstnameTxt.text else { return }
+        guard let lastname = LastnameTxt.text else { return }
+        guard let email = EmailTxt.text else { return }
+        guard let username = UsernameTxt.text else { return }
+        guard let password = PasswordTxt.text else { return }
         
         if firstname.isEmpty || lastname.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty {
             
-            //keep the process in background
             DispatchQueue.main.async {
                 
                 //Contiene el mensaje de error
@@ -289,9 +293,92 @@ class SignUpController: UIViewController {
                     mg.removeFromSuperview()
                 })
             }
+            
         } else {
             
+            //Process for to Sign Up
+            guard let url = NSURL(string: "http://localhost:1337/sign_up/") else { return }
+            
+            //Set url for to start request
+            let request = NSMutableURLRequest(url: url as URL)
+            
+            //Define method
+            request.httpMethod = "POST"
+            
+            //Define body post
+            let body = "first_name=\(firstname)&last_name=\(lastname)&email=\(email)&username=\(username)&password=\(password)"
+            request.httpBody = body.data(using: .utf8)
+            
+            let session = URLSession.shared
+            let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
+                
+                guard let data = data else { return }
+                
+                if let err = error {
+                    print("Oops something go mad ==>\(err)")
+                } else {
+                    
+                    DispatchQueue.main.async {
+                        
+                        do {
+                            //cast to JSON Object
+                            let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
+                            
+                            guard let parseJSON = UserModel(dict: json as! [String : Any]) else {
+                                print("Error to parse data")
+                                return
+                            }
+                            
+                            //pass object
+                            let id = parseJSON.id
+                            
+                            //Detect if exist some data
+                            if id != nil {
+                                
+                                print("I found these data ==> \(parseJSON)")
+                                
+                                //keep process in background
+                                DispatchQueue.main.async {
+                                    
+                                    //Encode objects send from server
+                                    UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+                                    
+                                    //Conver to data the objects
+                                    guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
+                                    
+                                    //Decode and insert all data in model
+                                    guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
+                                    
+                                    
+                                    //Store all info on global var
+                                    userData = userInfo
+                                }
+                                
+                                //Keep process on background
+                                DispatchQueue.main.async {
+                                    guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
+                                    mainTabBarController.SetupController()
+                                    self.dismiss(animated: true, completion: nil)
+                                }
+                            }
+                            
+                            //Catch any error
+                        } catch let errorJSON {
+                            print("Ocurrio un error ===> \(errorJSON)")
+                        }
+                    }
+                }
+            }
+            
+            //prepare session
+            task.resume()
         }
+    }
+    
+    //load signIn view
+    @objc fileprivate func SignIn() {
+        let controller = SignInController()
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     //Create backgroundColor grandient

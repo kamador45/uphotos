@@ -233,6 +233,14 @@ class UserProfileHeader: UICollectionViewCell {
         SettingsStadisticUsr()
         SettingsToolBar()
     }
+    
+    var userInfo: UserModel? {
+        didSet {
+            DispatchQueue.main.async {
+                self.UsernameLbl.text = self.userInfo?.username
+            }
+        }
+    }
 
     //Settings portrait
     fileprivate func SetPortrait() {
