@@ -43,17 +43,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     //Setup Controller and detect the session
     func SetupController() {
         
-        //load data content send from server
-        guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-
-        guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-
-
-        //store all data on global var
-        userData = userInfo
+        let id = userData?.id
         
-        //Detect if user it is log in
-        if  userInfo.id != nil {
+        //Detect if user it is log in !(userInfo.id).isEmpty
+        if id != nil {
+            
             //Home Controller
             let homeNavController = self.TemplateControllers(unselected: #imageLiteral(resourceName: "home_unselected.png"), selected: #imageLiteral(resourceName: "home_selected.png"), rootViewController: HomeFeedController(collectionViewLayout: UICollectionViewFlowLayout()))
             
@@ -66,7 +60,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             let uploadNavController = self.TemplateControllers(unselected: un_selected, selected: selected)
             
             //Notify Controller
-            let notifyNavController = self.TemplateControllers(unselected: #imageLiteral(resourceName: "notify_unselected.png"), selected: #imageLiteral(resourceName: "notify_selected.png"))
+            let notifyNavController = self.TemplateControllers(unselected: #imageLiteral(resourceName: "notify_unselected.png"), selected: #imageLiteral(resourceName: "notify_selected.png"), rootViewController: NotifyController(collectionViewLayout: UICollectionViewFlowLayout()))
             
             //Carga el controlador y se inicializa el collectionview
             let layout = UICollectionViewFlowLayout()
@@ -100,14 +94,19 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             for item in items {
                 item.imageInsets = UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0)
             }
+            
         } else {
             DispatchQueue.main.async {
-                let loginController = SignInController()
-                let NavController = UINavigationController(rootViewController: loginController)
+                let SignController = SignInController()
+                let NavController = UINavigationController(rootViewController: SignController)
+                NavController.modalPresentationStyle = .overFullScreen
                 self.present(NavController, animated: true, completion: nil)
             }
+            
+            return
         }
     }
+    
     
     //template controller for tabbar
     fileprivate func TemplateControllers(unselected: UIImage, selected:UIImage, rootViewController: UIViewController = UIViewController()) -> UINavigationController {
@@ -118,6 +117,5 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         navController.tabBarItem.selectedImage = selected
         
         return navController
-        
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class SignUpController: UIViewController {
+class SignUpController: UIViewController, UITextFieldDelegate {
     
     //Settings all objects on view
     let brandApp: UILabel = {
@@ -124,6 +124,13 @@ class SignUpController: UIViewController {
         return lbl
     }()
     
+    let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.isUserInteractionEnabled = true
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -132,6 +139,19 @@ class SignUpController: UIViewController {
         
         //hidden navigationbar
         navigationController?.isNavigationBarHidden = true
+        
+        //setting textfield for to use return button
+        //define delegate
+        FirstnameTxt.delegate = self
+        FirstnameTxt.tag = 0
+        LastnameTxt.delegate = self
+        LastnameTxt.tag = 1
+        EmailTxt.delegate = self
+        EmailTxt.tag = 2
+        UsernameTxt.delegate = self
+        UsernameTxt.tag = 3
+        PasswordTxt.delegate = self
+        PasswordTxt.tag = 4
         
         //execute all functions
         CreateGradienteBackground()
@@ -142,8 +162,19 @@ class SignUpController: UIViewController {
     fileprivate func SetObjectsView() {
         
         //Add to main views
+        view.addSubview(scrollView)
+        
+        //define constraint
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            scrollView.heightAnchor.constraint(equalToConstant: view.frame.height)
+        ])
+        
         view.addSubview(brandApp)
         view.addSubview(CopyRightApp)
+        
         
         //Constraint
         NSLayoutConstraint.activate([
@@ -158,13 +189,14 @@ class SignUpController: UIViewController {
             CopyRightApp.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5),
         ])
         
+        
         //Create secondary view
         let SecondaryView = UIView()
         SecondaryView.translatesAutoresizingMaskIntoConstraints = false
         
         //add to main view
         view.addSubview(SecondaryView)
-        
+
         //Constraint View
         NSLayoutConstraint.activate([
             SecondaryView.topAnchor.constraint(equalTo: brandApp.bottomAnchor, constant: 20),
@@ -174,17 +206,16 @@ class SignUpController: UIViewController {
             SecondaryView.heightAnchor.constraint(equalToConstant: view.frame.height / 2)
         ])
         
-        
         //StackView firstname and lastname
         let stackView = UIStackView(arrangedSubviews: [FirstnameTxt,LastnameTxt])
         stackView.axis = .horizontal
         stackView.spacing = 5
         stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         //Add to secondary view
         SecondaryView.addSubview(stackView)
-    
+
         //Constraint
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: SecondaryView.topAnchor, constant: 10),
@@ -192,17 +223,17 @@ class SignUpController: UIViewController {
             stackView.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
             stackView.heightAnchor.constraint(equalToConstant: 50)
         ])
-        
+
         //stackview email
         let StackViewEmail = UIStackView(arrangedSubviews: [EmailTxt])
         StackViewEmail.axis = .vertical
         StackViewEmail.spacing = 5
         StackViewEmail.distribution = .fillEqually
         StackViewEmail.translatesAutoresizingMaskIntoConstraints = false
-        
+
         //Add to secondary view
         SecondaryView.addSubview(StackViewEmail)
-        
+
         //Constraint
         NSLayoutConstraint.activate([
             StackViewEmail.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 5),
@@ -210,17 +241,17 @@ class SignUpController: UIViewController {
             StackViewEmail.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
             StackViewEmail.heightAnchor.constraint(equalToConstant: 50)
         ])
-        
+
         //Create StackView
         let StackViewUsr = UIStackView(arrangedSubviews: [UsernameTxt, PasswordTxt])
         StackViewUsr.translatesAutoresizingMaskIntoConstraints = false
         StackViewUsr.axis = .horizontal
         StackViewUsr.distribution = .fillEqually
         StackViewUsr.spacing = 5
-        
+
         //Add to secondary view
         SecondaryView.addSubview(StackViewUsr)
-        
+
         //Constraint
         NSLayoutConstraint.activate([
             StackViewUsr.topAnchor.constraint(equalTo: StackViewEmail.bottomAnchor, constant: 5),
@@ -228,29 +259,28 @@ class SignUpController: UIViewController {
             StackViewUsr.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
             StackViewUsr.heightAnchor.constraint(equalToConstant: 50)
         ])
-        
-        
+
         //Add to Secondary View
         SecondaryView.addSubview(SignUpBtn)
-        
+
         //Constraint
         NSLayoutConstraint.activate([
             SignUpBtn.topAnchor.constraint(equalTo: StackViewUsr.bottomAnchor, constant: 5),
             SignUpBtn.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5)
         ])
-        
+
         //Add to Secondary View
         SecondaryView.addSubview(OrLbl)
-        
+
         //Constraint
         NSLayoutConstraint.activate([
             OrLbl.topAnchor.constraint(equalTo: SignUpBtn.bottomAnchor, constant: 5),
             OrLbl.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5)
         ])
-        
+
         //Add SignIn btn to secondary views
         SecondaryView.addSubview(SignInBtn)
-        
+
         //Constraint
         NSLayoutConstraint.activate([
             SignInBtn.topAnchor.constraint(equalTo: OrLbl.bottomAnchor, constant: 5),
@@ -297,7 +327,7 @@ class SignUpController: UIViewController {
         } else {
             
             //Process for to Sign Up
-            guard let url = NSURL(string: "http://localhost:1337/sign_up/") else { return }
+            guard let url = NSURL(string: "http://192.168.0.11:1337/sign_up/") else { return }
             
             //Set url for to start request
             let request = NSMutableURLRequest(url: url as URL)
@@ -318,59 +348,47 @@ class SignUpController: UIViewController {
                     print("Oops something go mad ==>\(err)")
                 } else {
                     
-                    DispatchQueue.main.async {
+                    do {
+                        //cast to JSON Object
+                        let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
                         
-                        do {
-                            //cast to JSON Object
-                            let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
+                        //Access to id send from server
+                        guard let id = json!["id"] as? String else {return}
+                        
+                        //Store data in dictionary
+                        let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
+                        
+                        //Detect if exist some data
+                        if !(id).isEmpty {
                             
-                            guard let parseJSON = UserModel(dict: json as! [String : Any]) else {
-                                print("Error to parse data")
-                                return
+                            print("I found this data \(id)")
+                            
+                            //encode objects receive from server
+                            UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+
+                            //convert data to object
+                            guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
+
+                            //decode and insert all data in model
+                            guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
+
+                            //Store all info in global var
+                            userData = userInfo
+                            
+                            //Load tabcontrollers
+                            DispatchQueue.main.async {
+                                appDelegates.Login()
                             }
-                            
-                            //pass object
-                            let id = parseJSON.id
-                            
-                            //Detect if exist some data
-                            if id != nil {
-                                
-                                print("I found these data ==> \(parseJSON)")
-                                
-                                //keep process in background
-                                DispatchQueue.main.async {
-                                    
-                                    //Encode objects send from server
-                                    UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
-                                    
-                                    //Conver to data the objects
-                                    guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-                                    
-                                    //Decode and insert all data in model
-                                    guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                                    
-                                    
-                                    //Store all info on global var
-                                    userData = userInfo
-                                }
-                                
-                                //Keep process on background
-                                DispatchQueue.main.async {
-                                    guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
-                                    mainTabBarController.SetupController()
-                                    self.dismiss(animated: true, completion: nil)
-                                }
-                            }
-                            
-                            //Catch any error
-                        } catch let errorJSON {
-                            print("Ocurrio un error ===> \(errorJSON)")
                         }
+                        
+                    //Catch any error
+                    } catch let errorJSON {
+                        print("Ocurrio un error ===> \(errorJSON)")
                     }
                 }
             }
             
-            //prepare session
+            //finished request
             task.resume()
         }
     }
@@ -378,6 +396,7 @@ class SignUpController: UIViewController {
     //load signIn view
     @objc fileprivate func SignIn() {
         let controller = SignInController()
+        controller.modalPresentationStyle = .overFullScreen
         navigationController?.pushViewController(controller, animated: true)
     }
     
@@ -389,6 +408,34 @@ class SignUpController: UIViewController {
         grandient.endPoint = CGPoint(x: 0.8, y: -0.0)
         grandient.colors = [UIColor.red.withAlphaComponent(8).cgColor, UIColor.white.withAlphaComponent(0.5).cgColor]
         self.view.layer.addSublayer(grandient)
+    }
+    
+    //Detect when user to begin to edit
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.4) {
+            self.scrollView.frame = self.view.bounds
+            self.view.frame = CGRect(x: 0, y: -100, width: self.view.frame.width, height: self.view.frame.height)
+        }
+    }
+    
+    //Detect when user has beed finished of edit
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.3) {
+            self.scrollView.frame = self.view.bounds
+            self.view.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+        }
+    }
+    
+    //Active return button
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        if let nextField = FirstnameTxt.superview?.viewWithTag(textField.tag + 1) as? UITextField {
+            nextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+        }
+        
+        return false
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

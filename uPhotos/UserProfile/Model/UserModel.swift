@@ -8,52 +8,31 @@
 
 import Foundation
 
-//struct UserModel:Codable {
-//
-//    let id:String
-//    let username:String
-//    let first_name:String
-//    let last_name:String
-//    let profile_url:String
-//
-//    //define diccionary
-//    init?(dict:[String:Any]) {
-//        guard let id =  dict["id"] as? String else {return nil}
-//        guard let username = dict["username"] as? String else {return nil}
-//        guard let first_name = dict["first_name"] as? String else {return nil}
-//        guard let last_name = dict["last_name"] as? String else {return nil}
-//        guard let profile_url = dict["profile_url"] as? String else {return nil}
-//
-//        //Assign values to main var
-//        self.id = id
-//        self.username = username
-//        self.first_name = first_name
-//        self.last_name = last_name
-//        self.profile_url = profile_url
-//    }
-//}
-
 struct UserModel:Codable {
     
     let id:String
     let username:String
     let first_name:String
     let last_name:String
-    //let profile_url:String
+    let path_pic:String
+    let path_portrait:String
+    let filename_pic:String
+    let filename_portrait:String
+    let bio:String
+    let status:String
     
     //define the diccionary
-    init?(dict:[String:Any]) {
+    init(uid: String, dict:[String:Any]) {
         
-        guard let id = dict["id"] as? String else {return nil}
-        guard let username = dict["username"] as? String else {return nil}
-        guard let first_name = dict["first_name"] as? String else {return nil}
-        guard let last_name = dict["last_name"] as? String else {return nil}
-        //guard let profile_urls = dict["profile_url"] as? String else {return nil}
-        
-        self.id = id
-        self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
-        //self.profile_url = profile_urls
+        self.id = uid
+        self.username = dict["username"] as? String ?? ""
+        self.first_name = dict["first_name"] as? String ?? ""
+        self.last_name = dict["last_name"] as? String ?? ""
+        self.path_pic = dict["path_pic"] as? String ?? ""
+        self.path_portrait = dict["path_portrait"] as? String ?? ""
+        self.filename_pic = dict["filename"] as? String ?? ""
+        self.filename_portrait = dict["filename_portrait"] as? String ?? ""
+        self.bio = dict["bio"] as? String ?? ""
+        self.status = dict["status"] as? String ?? ""
     }
 }

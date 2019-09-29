@@ -12,6 +12,15 @@ import UIKit
 class NotifyController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = .brown
+        view.backgroundColor = .white
+    }
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            
+            navigationItem.title = "Notifications"
+        }
     }
 }

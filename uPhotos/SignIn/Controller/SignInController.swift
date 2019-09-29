@@ -87,17 +87,24 @@ class SignInController: UIViewController, UITextFieldDelegate {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         return lbl
     }()
+
+    let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.isUserInteractionEnabled = true
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
     
 
     //first function on load
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    
         //Define background color
-        view.backgroundColor = UIColor.red.withAlphaComponent(0.6)
+        view.backgroundColor = UIColor.lightGray
         
         //hidden navigationbar
-        navigationController?.isNavigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         
         //define delegate
         UsernameTxt.delegate = self
@@ -106,12 +113,23 @@ class SignInController: UIViewController, UITextFieldDelegate {
         PasswordTxt.tag = 1
         
         //Execute functions
-        CreateGradienteBackground()
         SetObjectsView()
     }
     
+    
     //Set main objects
     fileprivate func SetObjectsView() {
+        
+        //Add to main views
+        view.addSubview(scrollView)
+        
+        //define constraint
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            scrollView.heightAnchor.constraint(equalToConstant: view.frame.height)
+        ])
         
         //Add to main view
         view.addSubview(brandApp)
@@ -197,7 +215,7 @@ class SignInController: UIViewController, UITextFieldDelegate {
         grandient.frame.size = self.view.frame.size
         grandient.startPoint = CGPoint(x: -0.0, y: 0.6)
         grandient.endPoint = CGPoint(x: 0.8, y: -0.0)
-        grandient.colors = [UIColor.red.withAlphaComponent(8).cgColor, UIColor.white.withAlphaComponent(0.5).cgColor]
+        grandient.colors = [UIColor.red.cgColor, UIColor.white.cgColor]
         self.view.layer.addSublayer(grandient)
     }
     
@@ -235,7 +253,7 @@ class SignInController: UIViewController, UITextFieldDelegate {
             }
         } else {
             //Process for to Sign Up
-            guard let url = URL(string: "http://localhost:1337/sign_in/") else { return }
+            guard let url = URL(string: "http://192.168.0.11:1337/sign_in/") else { return }
             
             //start request
             let request = NSMutableURLRequest(url: url)
@@ -260,51 +278,39 @@ class SignInController: UIViewController, UITextFieldDelegate {
                 } else {
                     
                     do {
-                        
-                        //serialization
+                        //cast to JSON Object
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
                         
-                        //store all json data in model 
-                        guard let parseJSON = UserModel(dict: json as! [String : Any]) else {
-                            print("Error to parse data")
-                            return
+                        guard let id = json!["id"] as? String else {return}
+                        
+                        let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
+                        
+                        //Detect if exist some data
+                        if !(id).isEmpty {
+                            
+                            print("I found this data \(id)")
+                            
+                            //encode objects receive from server
+                            UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+                            
+                            //convert data to object
+                            guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
+                            
+                            //decode and insert all data in model
+                            guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
+                            
+                            //Store all info in global var
+                            userData = userInfo
+                            
+                            //Load tabcontrollers
+                            DispatchQueue.main.async {
+                                appDelegates.Login()
+                            }
                         }
                         
-                        //access to object
-                        let id = parseJSON.id
-                        
-                        //detect if exist some data
-                        if id != nil {
-                            print("I found this data ==>\(id)")
-                            
-                            //keep process on background
-                            DispatchQueue.main.async {
-                                
-                                //encode objects receive from server
-                                UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
-                                
-                                //convert data to object
-                                guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-                                
-                                //decode and insert all data in model
-                                guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                                
-                                //Store all info in global var
-                                userData = userInfo
-                            }
-                            
-                            DispatchQueue.main.async {
-                                guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
-                                mainTabBarController.SetupController()
-                                self.dismiss(animated: true, completion: nil)
-                            }
-                            
-                        } else {
-                            
-                        }
-                        
-                    } catch let errorParse {
-                        print("error to parse JSON ==> \(errorParse)")
+                        //Catch any error
+                    } catch let errorJSON {
+                        print("Ocurrio un error ===> \(errorJSON)")
                     }
                 }
             }
@@ -319,17 +325,40 @@ class SignInController: UIViewController, UITextFieldDelegate {
         navigationController?.pushViewController(controller, animated: true)
     }
     
+    //Detect when user to begin to edit
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.4) {
+            self.scrollView.frame = self.view.bounds
+            self.view.frame = CGRect(x: 0, y: -100, width: self.view.frame.width, height: self.view.frame.height)
+        }
+    }
+    
+    //Detect when user has beed finished of edit
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.3) {
+            self.scrollView.frame = self.view.bounds
+            self.view.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+        }
+    }
     
     //Active return button
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
-        if let nextField = PasswordTxt.superview?.viewWithTag(textField.tag + 1) as? UITextField {
+        if let nextField = UsernameTxt.superview?.viewWithTag(textField.tag + 1) as? UITextField {
             nextField.becomeFirstResponder()
         } else {
             next?.resignFirstResponder()
         }
         
         return false
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

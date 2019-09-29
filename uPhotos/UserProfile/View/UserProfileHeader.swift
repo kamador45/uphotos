@@ -9,22 +9,25 @@
 import Foundation
 import UIKit
 
-class UserProfileHeader: UICollectionViewCell {
+//name of notification
+let UpdateProfile = "updateProfile"
+
+class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     //portrait photo
-    let Portrait: UIImageView = {
-        let img = UIImage(named: "default-portrait.jpg")
-        let imv = UIImageView(image: img)
+    let Portrait: DownloadImage = {
+        let img = UIImage(named: "portrait.png")
+        let imv = DownloadImage(image: img)
         imv.contentMode = .scaleAspectFill
         imv.clipsToBounds = true
         imv.translatesAutoresizingMaskIntoConstraints = false
         return imv
     }()
-    
+
     //User avatar
-    let Avatar: UIImageView = {
+    let Avatar: DownloadImage = {
         let img = UIImage(named: "user_avatar.png")
-        let ava = UIImageView(image: img)
+        let ava = DownloadImage(image: img)
         ava.contentMode = .scaleAspectFill
         ava.layer.cornerRadius = 7
         ava.layer.borderWidth = 3
@@ -39,7 +42,7 @@ class UserProfileHeader: UICollectionViewCell {
         let lbl = UILabel()
         lbl.text = "Firstname"
         lbl.textAlignment = .center
-        lbl.textColor =  .black
+        lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 20)
         lbl.numberOfLines = 0
         lbl.translatesAutoresizingMaskIntoConstraints = false
@@ -50,7 +53,7 @@ class UserProfileHeader: UICollectionViewCell {
         let lbl = UILabel()
         lbl.text = "Lastname"
         lbl.textAlignment = .center
-        lbl.textColor =  .black
+        lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 20)
         lbl.numberOfLines = 0
         lbl.translatesAutoresizingMaskIntoConstraints = false
@@ -61,28 +64,8 @@ class UserProfileHeader: UICollectionViewCell {
         let lbl = UILabel()
         lbl.text = "Username"
         lbl.textAlignment = .center
-        lbl.textColor =  UIColor.lightGray
+        lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 18)
-        lbl.numberOfLines = 0
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        return lbl
-    }()
-    
-    let CurrentLocation: UIImageView = {
-        let img =  UIImage(named: "location-pin.png")
-        let imv = UIImageView(image: img)
-        imv.contentMode = .scaleAspectFit
-        imv.clipsToBounds = true
-        imv.translatesAutoresizingMaskIntoConstraints = false
-        return imv
-    }()
-    
-    let CurrentCountryLbl: UILabel = {
-        let lbl = UILabel()
-        lbl.text = "Jinotega, Nicaragua"
-        lbl.textAlignment = .left
-        lbl.textColor =  UIColor.lightGray
-        lbl.font = UIFont.boldSystemFont(ofSize: 15)
         lbl.numberOfLines = 0
         lbl.translatesAutoresizingMaskIntoConstraints = false
         return lbl
@@ -90,7 +73,6 @@ class UserProfileHeader: UICollectionViewCell {
     
     let BioLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "I am a software engineering who love programmer."
         lbl.textAlignment = .center
         lbl.textColor =  UIColor.lightGray
         lbl.font = UIFont.boldSystemFont(ofSize: 15)
@@ -101,8 +83,8 @@ class UserProfileHeader: UICollectionViewCell {
     
     let views: UIView = {
         let views = UIView()
-        views.backgroundColor = .red
         views.clipsToBounds = true
+        views.backgroundColor = .white
         views.translatesAutoresizingMaskIntoConstraints = false
         return views
     }()
@@ -220,30 +202,123 @@ class UserProfileHeader: UICollectionViewCell {
         return lbl
     }()
     
+    //declare notify
+    let updateProfilePic = Notification.Name(rawValue: UpdateProfile)
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
     //first function on load
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        //Define background color
-        backgroundColor = .white
+        //Download info user in brackground
+        DispatchQueue.main.async {
+            self.DownloadInfoUser()
+        }
         
         //execute functions
-        SetPortrait()
+        createObservers()
+        SetObjects()
         SettingsStadisticUsr()
         SettingsToolBar()
+        LoadOptions()
     }
     
-    var userInfo: UserModel? {
+    //create observer method
+    func createObservers() {
+        //update profile pic
+        NotificationCenter.default.addObserver(self, selector: #selector(UserProfileHeader.updateImgProfile(notification:)), name: updateProfilePic, object: nil)
+    }
+    
+    @objc func updateImgProfile(notification: NSNotification) {
+        
+        let isProfile = notification.name
+        
+        if isProfile == updateProfilePic {
+            DispatchQueue.main.async {
+                appDelegates.Login()
+            }
+        }
+    }
+    
+    
+    var userInfoProfile = userData {
         didSet {
             DispatchQueue.main.async {
-                self.UsernameLbl.text = self.userInfo?.username
+                
+                //download and set profile pic
+                guard let urlImage = self.userInfoProfile?.path_pic else {return}
+                self.Avatar.LoadImage(urlString: urlImage)
+
+                //download portrait pic
+                guard let urlPortrait = self.userInfoProfile?.path_portrait else {return}
+                self.Portrait.LoadImage(urlString: urlPortrait)
+
+
+                //safe statement
+                guard let firstname = self.userInfoProfile?.first_name else {return}
+                guard let lastname = self.userInfoProfile?.last_name else {return}
+                guard let username = self.userInfoProfile?.username else {return}
+                guard let bio = self.userInfoProfile?.bio else {return}
+
+
+                //Show info send from server
+                self.FirstnameLbl.text = firstname
+                self.LastnameLbl.text = lastname
+                self.UsernameLbl.text = username
+                self.BioLbl.text = bio
             }
+        }
+    }
+    
+    //download info user
+    fileprivate func DownloadInfoUser() {
+        
+        //capture id user on session
+        guard let userId = userData?.id else {return}
+        
+        //define the url
+        guard let url = URL(string: "http://192.168.0.11:1337/find/\(userId)") else {return}
+        
+        NetworkingServices.getData(from: url) { (data, response, error) in
+            guard let data = data else {return}
+            
+            if let err = error {
+                print("Oops something go wrong==>\(err)")
+            } else {
+                do {
+                    //receive data send from server
+                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
+                    
+                    //access to id
+                    guard let id = json!["id"] as? String else {return}
+                    
+                    //adapt all object to model
+                    let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
+                    
+                    //compare id
+                    if !(id).isEmpty {
+                        DispatchQueue.main.async {
+                            self.Portrait.LoadImage(urlString: parseJSON.path_portrait)
+                            self.Avatar.LoadImage(urlString: parseJSON.path_pic)
+                            self.FirstnameLbl.text = parseJSON.first_name
+                            self.LastnameLbl.text = parseJSON.last_name
+                            self.BioLbl.text = parseJSON.bio
+                        }
+                    }
+                    
+                } catch let errorJSON {
+                    print("Oops something go wrong==>\(errorJSON)")
+                }
+            }
+            
         }
     }
 
     //Settings portrait
-    fileprivate func SetPortrait() {
+    fileprivate func SetObjects() {
         
         //add to main view
         addSubview(views)
@@ -283,11 +358,14 @@ class UserProfileHeader: UICollectionViewCell {
         let darkMode = UIBlurEffect(style: .dark)
         let blurView = UIVisualEffectView(effect: darkMode)
         blurView.frame = coverPortrait.bounds
-        blurView.alpha = 0.5
+        blurView.alpha = 0.6
         blurView.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 200)
         
         //Add to main view
         addSubview(blurView)
+        
+        //Add to main view
+        views.addSubview(Avatar)
         
         //Add to main view
         addSubview(Avatar)
@@ -296,15 +374,15 @@ class UserProfileHeader: UICollectionViewCell {
         NSLayoutConstraint.activate([
             Avatar.topAnchor.constraint(equalTo: Portrait.bottomAnchor, constant: -120),
             Avatar.centerXAnchor.constraint(equalTo: centerXAnchor),
-            Avatar.widthAnchor.constraint(equalToConstant: 150),
-            Avatar.heightAnchor.constraint(equalToConstant: 150),
+            Avatar.widthAnchor.constraint(equalToConstant: 110),
+            Avatar.heightAnchor.constraint(equalToConstant: 130),
         ])
         
         //stackview
         let stackview = UIStackView(arrangedSubviews: [FirstnameLbl,LastnameLbl])
         stackview.distribution = .fillEqually
         stackview.axis = .horizontal
-        stackview.spacing = 5
+        stackview.spacing = -4
         stackview.translatesAutoresizingMaskIntoConstraints = false
         
         //add to main view
@@ -326,29 +404,11 @@ class UserProfileHeader: UICollectionViewCell {
         ])
         
         //add to main view
-        addSubview(CurrentLocation)
-        
-        //define constraint
-        NSLayoutConstraint.activate([
-            CurrentLocation.topAnchor.constraint(equalTo: UsernameLbl.bottomAnchor, constant: 5),
-            CurrentLocation.centerXAnchor.constraint(equalTo: centerXAnchor, constant: -70)
-        ])
-        
-        //add to main view
-        addSubview(CurrentCountryLbl)
-        
-        //define constraint
-        NSLayoutConstraint.activate([
-            CurrentCountryLbl.topAnchor.constraint(equalTo: UsernameLbl.bottomAnchor, constant: 5),
-            CurrentCountryLbl.leftAnchor.constraint(equalTo: CurrentLocation.leftAnchor, constant: 10)
-        ])
-        
-        //add to main view
         addSubview(BioLbl)
         
         //define constraint
         NSLayoutConstraint.activate([
-            BioLbl.topAnchor.constraint(equalTo: CurrentLocation.bottomAnchor, constant: 5),
+            BioLbl.topAnchor.constraint(equalTo: UsernameLbl.bottomAnchor, constant: 5),
             BioLbl.centerXAnchor.constraint(equalTo: UsernameLbl.centerXAnchor),
             BioLbl.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
             BioLbl.rightAnchor.constraint(equalTo: rightAnchor, constant: -20)
@@ -400,16 +460,16 @@ class UserProfileHeader: UICollectionViewCell {
         
         //separator line
         let topSeparator = UIView()
-        topSeparator.backgroundColor = UIColor.lightGray
+        topSeparator.backgroundColor = .systemGray
         topSeparator.translatesAutoresizingMaskIntoConstraints = false
         
         let bottomSeparator = UIView()
-        bottomSeparator.backgroundColor = UIColor.lightGray
+        bottomSeparator.backgroundColor = .systemGray
         bottomSeparator.translatesAutoresizingMaskIntoConstraints = false
+      
         
         //container
         let containerView = UIView()
-        containerView.backgroundColor = UIColor.white
         containerView.translatesAutoresizingMaskIntoConstraints = false
         
         //add to main view
@@ -470,7 +530,26 @@ class UserProfileHeader: UICollectionViewCell {
             stackviews.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -10),
             stackviews.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0)
         ])
+        
+        
+        //detect darkmode
+//        if #available(iOS 12, *) {
+//            if traitCollection.userInterfaceStyle == .light {
+//                print("light detected")
+//                topSeparator.backgroundColor = .systemGray
+//                bottomSeparator.backgroundColor = .systemGray
+//            } else {
+//                print("dark detected")
+//                topSeparator.backgroundColor = .white
+//                bottomSeparator.backgroundColor = .white
+//                containerView.backgroundColor = .black
+//                CollectionPicLbl.textColor = .systemPink
+//                GridBtn.tintColor = .systemPink
+//                ListBtn.tintColor = .systemPink
+//            }
+//        }
     }
+
     
     //follow usrs
     @objc fileprivate func Following() {
@@ -483,6 +562,85 @@ class UserProfileHeader: UICollectionViewCell {
     
     @objc fileprivate func ChooseList() {
         print("list view")
+    }
+    
+    func LoadOptions() {
+        EditProfile.addTarget(self, action: #selector(LoadAlertController), for: .touchUpInside)
+    }
+    
+    @objc func LoadAlertController() {
+        //create alert controller
+        let actionSheet = UIAlertController(title: "Hey \(userData?.username ?? "")", message: "what do you want update?", preferredStyle: .actionSheet)
+        
+        //Load update profile pic
+        let updateProfilePic = UIAlertAction(title: "Update Profile Pic", style: .default) { (_) in
+            do {
+                let controller = UpdateProfilePicController()
+                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
+            }
+        }
+        
+        //update portraint pic
+        let updatePortrait = UIAlertAction(title: "Update Portrait", style: .default) { (_) in
+            do {
+                let controller = UpdatePortraitPic()
+                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
+                
+            }
+        }
+        
+        //update info user
+        let updateInfoUsr = UIAlertAction(title: "Update Info", style: .default) { (_) in
+            do {
+                print("Loading update info user")
+            }
+        }
+        
+        let destructive = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
+        
+        //add actions to alert controller
+        actionSheet.addAction(updateProfilePic)
+        actionSheet.addAction(updatePortrait)
+        actionSheet.addAction(updateInfoUsr)
+        actionSheet.addAction(destructive)
+        
+        UIApplication.shared.keyWindow?.rootViewController?.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    //Change color
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        DispatchQueue.main.async {
+            if #available(iOS 12, *) {
+                if self.traitCollection.userInterfaceStyle == .light {
+                    self.AdaptHeadertoLight()
+                } else {
+                    self.AdaptHeadertoDark()
+                }
+            }
+        }
+    }
+    
+    fileprivate func AdaptHeadertoLight() {
+        //define new colors when dark mode it's active
+        Avatar.layer.borderColor = UIColor.white.cgColor
+        FirstnameLbl.textColor = .black
+        LastnameLbl.textColor = .black
+        UsernameLbl.textColor = .black
+        BioLbl.textColor = .systemGray
+    }
+    
+    //this function try to adapt interface
+    fileprivate func AdaptHeadertoDark() {
+
+        //define new colors when dark mode it's active
+        Avatar.layer.borderColor = UIColor.black.cgColor
+        FirstnameLbl.textColor = .systemPink
+        LastnameLbl.textColor = .systemPink
+        UsernameLbl.textColor = .systemPink
+        BioLbl.textColor = .systemPink
+        LikesLbl.textColor = .systemPink
+        FollowersLbl.textColor = .systemPink
+        FollowingLbl.textColor = .systemPink
     }
 
     required init?(coder aDecoder: NSCoder) {

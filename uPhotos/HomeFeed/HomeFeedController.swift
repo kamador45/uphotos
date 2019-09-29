@@ -12,6 +12,18 @@ import UIKit
 class HomeFeedController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = .red
+        collectionView.backgroundColor =  .darkGray
+    }
+    
+    //Show large title
+    override func viewDidAppear(_ animated: Bool) {
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.title = "Home Feed"
+        }
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
     }
 }

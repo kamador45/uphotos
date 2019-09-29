@@ -7,9 +7,10 @@
 //
 
 import UIKit
-
-//manage data with global var
+//
+////manage data with global var
 var userData:UserModel?
+let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,12 +20,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        //load data content send from server
+        guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else { return true }
+
+        guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return true}
+
+        userData = userInfo
         
-        //Define root controller
-        window = UIWindow()
-        window?.rootViewController = MainTabBarController()
+        
+        //detect if exist session
+        if userData != nil {
+            let id = userData!.id
+            if !(id).isEmpty {
+                Login()
+            }
+        }
         
         return true
+    }
+    
+    //define the rootvViewController
+    func Login() {
+        let controller = MainTabBarController()
+        window?.rootViewController = controller
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
