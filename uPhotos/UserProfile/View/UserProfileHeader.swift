@@ -9,9 +9,6 @@
 import Foundation
 import UIKit
 
-//name of notification
-let UpdateProfile = "updateProfile"
-
 class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     //portrait photo
@@ -40,7 +37,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     let FirstnameLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "Firstname"
         lbl.textAlignment = .center
         lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 20)
@@ -51,7 +47,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     let LastnameLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "Lastname"
         lbl.textAlignment = .center
         lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 20)
@@ -62,7 +57,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     let UsernameLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "Username"
         lbl.textAlignment = .center
         lbl.textColor = .black
         lbl.font = UIFont.boldSystemFont(ofSize: 18)
@@ -202,67 +196,33 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         return lbl
     }()
     
-    //declare notify
-    let updateProfilePic = Notification.Name(rawValue: UpdateProfile)
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     //first function on load
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        //Download info user in brackground
-        DispatchQueue.main.async {
-            self.DownloadInfoUser()
-        }
-        
         //execute functions
-        createObservers()
         SetObjects()
         SettingsStadisticUsr()
         SettingsToolBar()
         LoadOptions()
     }
-    
-    //create observer method
-    func createObservers() {
-        //update profile pic
-        NotificationCenter.default.addObserver(self, selector: #selector(UserProfileHeader.updateImgProfile(notification:)), name: updateProfilePic, object: nil)
-    }
-    
-    @objc func updateImgProfile(notification: NSNotification) {
-        
-        let isProfile = notification.name
-        
-        if isProfile == updateProfilePic {
-            DispatchQueue.main.async {
-                appDelegates.Login()
-            }
-        }
-    }
-    
-    
-    var userInfoProfile = userData {
+
+    var userInfoProfile: UserModel? {
         didSet {
             DispatchQueue.main.async {
-                
                 //download and set profile pic
-                guard let urlImage = self.userInfoProfile?.path_pic else {return}
-                self.Avatar.LoadImage(urlString: urlImage)
+                guard let urlProfile = self.userInfoProfile?.path_pic else {return}
+                self.Avatar.LoadImage(urlString: urlProfile)
 
                 //download portrait pic
                 guard let urlPortrait = self.userInfoProfile?.path_portrait else {return}
                 self.Portrait.LoadImage(urlString: urlPortrait)
-
-
+                
                 //safe statement
                 guard let firstname = self.userInfoProfile?.first_name else {return}
                 guard let lastname = self.userInfoProfile?.last_name else {return}
                 guard let username = self.userInfoProfile?.username else {return}
                 guard let bio = self.userInfoProfile?.bio else {return}
-
 
                 //Show info send from server
                 self.FirstnameLbl.text = firstname
@@ -270,50 +230,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
                 self.UsernameLbl.text = username
                 self.BioLbl.text = bio
             }
-        }
-    }
-    
-    //download info user
-    fileprivate func DownloadInfoUser() {
-        
-        //capture id user on session
-        guard let userId = userData?.id else {return}
-        
-        //define the url
-        guard let url = URL(string: "http://192.168.0.11:1337/find/\(userId)") else {return}
-        
-        NetworkingServices.getData(from: url) { (data, response, error) in
-            guard let data = data else {return}
-            
-            if let err = error {
-                print("Oops something go wrong==>\(err)")
-            } else {
-                do {
-                    //receive data send from server
-                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
-                    
-                    //access to id
-                    guard let id = json!["id"] as? String else {return}
-                    
-                    //adapt all object to model
-                    let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
-                    
-                    //compare id
-                    if !(id).isEmpty {
-                        DispatchQueue.main.async {
-                            self.Portrait.LoadImage(urlString: parseJSON.path_portrait)
-                            self.Avatar.LoadImage(urlString: parseJSON.path_pic)
-                            self.FirstnameLbl.text = parseJSON.first_name
-                            self.LastnameLbl.text = parseJSON.last_name
-                            self.BioLbl.text = parseJSON.bio
-                        }
-                    }
-                    
-                } catch let errorJSON {
-                    print("Oops something go wrong==>\(errorJSON)")
-                }
-            }
-            
         }
     }
 
@@ -533,21 +449,21 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         
         
         //detect darkmode
-//        if #available(iOS 12, *) {
-//            if traitCollection.userInterfaceStyle == .light {
-//                print("light detected")
-//                topSeparator.backgroundColor = .systemGray
-//                bottomSeparator.backgroundColor = .systemGray
-//            } else {
-//                print("dark detected")
-//                topSeparator.backgroundColor = .white
-//                bottomSeparator.backgroundColor = .white
-//                containerView.backgroundColor = .black
-//                CollectionPicLbl.textColor = .systemPink
-//                GridBtn.tintColor = .systemPink
-//                ListBtn.tintColor = .systemPink
-//            }
-//        }
+        DispatchQueue.main.async {
+            if #available(iOS 12, *) {
+                if self.traitCollection.userInterfaceStyle == .light {
+                    topSeparator.backgroundColor = .systemGray
+                    bottomSeparator.backgroundColor = .systemGray
+               } else {
+                   topSeparator.backgroundColor = .white
+                   bottomSeparator.backgroundColor = .white
+                   containerView.backgroundColor = .black
+                   self.CollectionPicLbl.textColor = .systemPink
+                   self.GridBtn.tintColor = .systemPink
+                   self.ListBtn.tintColor = .systemPink
+               }
+           }
+        }
     }
 
     
@@ -592,7 +508,8 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         //update info user
         let updateInfoUsr = UIAlertAction(title: "Update Info", style: .default) { (_) in
             do {
-                print("Loading update info user")
+                let controller = UpdateInfoUsrController()
+                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
             }
         }
         
@@ -607,20 +524,9 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         UIApplication.shared.keyWindow?.rootViewController?.present(actionSheet, animated: true, completion: nil)
     }
     
-    //Change color
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        DispatchQueue.main.async {
-            if #available(iOS 12, *) {
-                if self.traitCollection.userInterfaceStyle == .light {
-                    self.AdaptHeadertoLight()
-                } else {
-                    self.AdaptHeadertoDark()
-                }
-            }
-        }
-    }
     
-    fileprivate func AdaptHeadertoLight() {
+    //try to adapt the view to enviroment actived
+    func AdaptHeadertoLight() {
         //define new colors when dark mode it's active
         Avatar.layer.borderColor = UIColor.white.cgColor
         FirstnameLbl.textColor = .black
@@ -630,7 +536,7 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     }
     
     //this function try to adapt interface
-    fileprivate func AdaptHeadertoDark() {
+    func AdaptHeadertoDark() {
 
         //define new colors when dark mode it's active
         Avatar.layer.borderColor = UIColor.black.cgColor

@@ -11,13 +11,17 @@ import UIKit
 
 class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    //access to diccionary
-    var usersInfo = userData
+    //Access to model user
+    var InfoUser: UserModel?
+    
+    //receive id user
+    var userId:String?
     
     //header id
     let header_id = "header"
     let celdaId = "CeldaId"
     
+    var RefreshControl = UIRefreshControl()
     
     //First function on load
     override func viewDidLoad() {
@@ -28,11 +32,19 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         taps.numberOfTouchesRequired = 1
         self.collectionView.addGestureRecognizer(taps)
         
-        //reload collectionview
-        collectionView.reloadData()
         
-        //settings navbar title
-        navigationItem.title = usersInfo?.username
+        //Call notification
+         NotificationCenter.default.addObserver(self, selector: #selector(Fetch), name: UpdateProfilePicController.ProfilePicture, object: "parseJSON")
+
+        //reload collectionview
+        RefreshControl.addTarget(self, action: #selector(ManageRefresh), for: .valueChanged)
+        Fetch()
+
+        if #available(iOS 10, *) {
+            collectionView.refreshControl = RefreshControl
+        } else {
+            collectionView.addSubview(RefreshControl)
+        }
         
         //register view on controller
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: header_id)
@@ -41,6 +53,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(ProfilePostUsrCell.self, forCellWithReuseIdentifier: celdaId)
         
         //call functions
+        DescargaNewInfoUsr()
         BtnLogOut()
     }
     
@@ -49,15 +62,47 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         DispatchQueue.main.async {
             if #available(iOS 12, *) {
                 if self.traitCollection.userInterfaceStyle == .light {
-                   print("light has been detected")
-                   self.collectionView.backgroundColor = .white
+                    print("light has been detected")
+                    self.collectionView.backgroundColor = .white
                } else {
-                   print("Dark has been detected")
-                   self.collectionView.backgroundColor = .black
+                    print("Dark has been detected")
+                    self.collectionView.backgroundColor = .black
                }
            }
         }
     }
+    
+    @objc fileprivate func Fetch() {
+        ManageRefresh()
+        collectionView.reloadData()
+    }
+    
+    @objc fileprivate func ManageRefresh() {
+        DescargaNewInfoUsr()
+        collectionView.refreshControl = RefreshControl
+        RefreshControl.endRefreshing()
+    }
+    
+    fileprivate func DescargaNewInfoUsr() {
+        DescargaUsrInfo()
+    }
+    
+    //Download info user
+    fileprivate func DescargaUsrInfo() {
+        //get id on current session
+         let uid = userId ?? (userData?.id ?? "")
+         
+         //Execute the process in brackground
+         NetworkingServices.DownloadPrueba(uid: uid) { (user) in
+             DispatchQueue.main.async {
+                //accede a la info del usuario
+                self.InfoUser = user
+                print(user)
+                let navBar = self.InfoUser?.username
+                self.navigationItem.title = navBar
+             }
+         }
+     }
     
     //Header settings
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -65,12 +110,28 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //Settings header view
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: header_id, for: indexPath) as! UserProfileHeader
         
+        DispatchQueue.main.async {
+            if #available(iOS 12, *) {
+                if self.traitCollection.userInterfaceStyle == .light {
+                    print("light has been detected")
+                    self.collectionView.backgroundColor = .white
+                    header.AdaptHeadertoLight()
+               } else {
+                    print("Dark has been detected")
+                    header.AdaptHeadertoDark()
+                    self.collectionView.backgroundColor = .black
+               }
+           }
+        }
+        
+        //updating info
+        self.InfoUser = userData
+        
         //pass data to header view
-        header.userInfoProfile = self.usersInfo
+        header.userInfoProfile = InfoUser
         
         return header
     }
-    
     
     //define number of cells
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

@@ -8,7 +8,7 @@
 
 import UIKit
 //
-////manage data with global var
+//manage data with global var
 var userData:UserModel?
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
@@ -16,7 +16,6 @@ let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

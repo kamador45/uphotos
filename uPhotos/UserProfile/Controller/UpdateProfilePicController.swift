@@ -114,7 +114,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
     //settings navbar
     func SettingNavBar() -> Void {
         
-        let navItem = UINavigationItem(title: "Profile Picture")
+        let navItem = UINavigationItem(title: "Update Profile Pic")
         navItem.rightBarButtonItem = SaveBtn
         let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(CancelEdit))
         navItem.leftBarButtonItem = cancelBtn
@@ -274,8 +274,6 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         SaveBtn.isEnabled = false
         //execute the function
         UpdateProfilePic()
-        let name = Notification.Name(rawValue: UpdateProfile)
-        NotificationCenter.default.post(name: name, object: nil)
     }
     
     //upload pic
@@ -325,7 +323,10 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         
     }
     
+    //define notify name
+    static let ProfilePicture = NSNotification.Name("ProfilePicture")
     
+    //Upload picture
     fileprivate func UpdateProfilePic() {
         
         //get id info user
@@ -364,6 +365,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
                 } else {
                     print("Profile pic has been updated")
                     self.dismiss(animated: true, completion: nil)
+                    NotificationCenter.default.post(name: UpdateProfilePicController.ProfilePicture, object: "parseJSON")
                 }
             })
             

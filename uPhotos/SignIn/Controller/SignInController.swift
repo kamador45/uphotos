@@ -278,30 +278,30 @@ class SignInController: UIViewController, UITextFieldDelegate {
                 } else {
                     
                     do {
+                        
                         //cast to JSON Object
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
-                        
+
                         guard let id = json!["id"] as? String else {return}
-                        
+
                         let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
-                        
+
                         //Detect if exist some data
                         if !(id).isEmpty {
-                            
+
                             print("I found this data \(id)")
-                            
+
                             //encode objects receive from server
                             UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
-                            
+
                             //convert data to object
                             guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-                            
+
                             //decode and insert all data in model
                             guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                            
+
                             //Store all info in global var
                             userData = userInfo
-                            
                             //Load tabcontrollers
                             DispatchQueue.main.async {
                                 appDelegates.Login()
@@ -352,6 +352,7 @@ class SignInController: UIViewController, UITextFieldDelegate {
         
         return false
     }
+
     
     override var canBecomeFirstResponder: Bool {
         return true

@@ -79,7 +79,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             //settings controller
             
             //define color
-            self.tabBar.tintColor = .purple
+            self.tabBar.tintColor = .systemPink
             
             //storage all controllers
             self.viewControllers = [homeNavController,

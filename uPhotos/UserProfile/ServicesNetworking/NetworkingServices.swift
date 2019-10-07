@@ -17,46 +17,80 @@ class NetworkingServices {
         URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
     }
     
-    static func FetchDataUsr() {
-        //send request for new data
-        guard let id = userData?.id else {return}
-        guard let url = URL(string: "http://192.168.0.11:1337/find/\(id)") else {return}
+    //download all new info of user
+    static func DownloadPrueba(uid:String, completion:@escaping(UserModel) -> ()) {
         
-        //call networking services
+        //Define the url
+        guard let url = URL(string: "http://192.168.0.11:1337/find/\(uid)") else {return}
+        
+        //process to network
         NetworkingServices.getData(from: url) { (data, response, error) in
-            guard let data = data else {return}
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
-                
-                guard let idUser = json!["id"] as? String else {return}
-                
-                let parseJSON = UserModel(uid: idUser, dict: json as! [String : Any])
-                
-                if !(id).isEmpty {
-                    DispatchQueue.main.async {
+            if let err = error {
+                print("Ocurrio un error con el nuevo metodo de descarga ==\(err)")
+            } else {
+                do {
+                    guard let data = data else {return}
+                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
+                    guard let idUsr = json!["id"] as? String else {return}
+                    
+                    if !(idUsr).isEmpty {
+                        let newDictionary = UserModel(uid: idUsr, dict: json as! [String : Any])
                         
-                        print(parseJSON)
                         
                         //encode objects receive from server
-                        UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
-                        
+                        UserDefaults.standard.set(try? PropertyListEncoder().encode(newDictionary), forKey: "parseJSON")
+
                         //convert data to object
                         guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-                        
+
                         //decode and insert all data in model
                         guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                        
+
                         //Store all info in global var
                         userData = userInfo
-                        
                     }
+                    
+                } catch let errorJSON {
+                    print("Ocurrio un error al atrapar los datos ==>\(errorJSON)")
                 }
-                
-            } catch let errorJSON {
-                print("Oops something go wrong ==>\(errorJSON)")
             }
-            
         }
+    }
+    
+    //capture and prepare info to update
+    static func UpdateInfoUsr(username:String, first_name:String, last_name:String, bio:String) {
+        //capture uid user on session
+        guard let id = userData?.id else {return}
+        
+        //prepare url
+        guard let url = URL(string: "http://192.168.0.11:1337/update_info/\(id)") else {return}
+        
+        //prepare request url
+        let request = NSMutableURLRequest(url: url)
+        
+        //define method
+        request.httpMethod = "PATCH"
+        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        
+        //define body
+        let body = "first_name=\(first_name)&last_name=\(last_name)&username=\(username)&bio=\(bio)"
+        request.httpBody = body.data(using: .utf8)
+        
+        
+        URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
+            print(request)
+            if let err = error {
+                print("Oops something had result bad ==>\(err)")
+            } else {
+                do {
+
+                    guard let data = data else {return}
+                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! NSDictionary
+                    print(json)
+                } catch let errorJSON {
+                    print("Error JSON ==>\(errorJSON)")
+                }
+            }
+        }.resume()
     }
 }

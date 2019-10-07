@@ -297,7 +297,7 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         guard let username = UsernameTxt.text else { return }
         guard let password = PasswordTxt.text else { return }
         
-        if firstname.isEmpty || lastname.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty {
+        if firstname.trimmingCharacters(in: .letters).isEmpty || lastname.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty {
             
             DispatchQueue.main.async {
                 
