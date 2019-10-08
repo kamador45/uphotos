@@ -18,7 +18,7 @@ class NetworkingServices {
     }
     
     //download all new info of user
-    static func DownloadPrueba(uid:String, completion:@escaping(UserModel) -> ()) {
+    static func DownloadMainInfoUsr(uid:String, completion:@escaping(UserModel) -> ()) {
         
         //Define the url
         guard let url = URL(string: "http://192.168.0.11:1337/find/\(uid)") else {return}
@@ -48,6 +48,8 @@ class NetworkingServices {
 
                         //Store all info in global var
                         userData = userInfo
+                        
+                        print(userInfo)
                     }
                     
                 } catch let errorJSON {

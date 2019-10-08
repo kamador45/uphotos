@@ -93,15 +93,15 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
          let uid = userId ?? (userData?.id ?? "")
          
          //Execute the process in brackground
-         NetworkingServices.DownloadPrueba(uid: uid) { (user) in
-             DispatchQueue.main.async {
-                //accede a la info del usuario
-                self.InfoUser = user
-                print(user)
-                let navBar = self.InfoUser?.username
-                self.navigationItem.title = navBar
-             }
-         }
+        NetworkingServices.DownloadMainInfoUsr(uid: uid) { (user) in
+            DispatchQueue.main.async {
+               //accede a la info del usuario
+               self.InfoUser = user
+               print(user)
+               let navBar = self.InfoUser?.username
+               self.navigationItem.title = navBar
+            }
+        }
      }
     
     //Header settings

@@ -11,10 +11,12 @@ import UIKit
 
 class UpdateInfoUsrController: UIViewController {
     
+    var InfoUser:UserModel?
+    var userId:String?
+    
     //NavBar
     let navBar: UINavigationBar = {
         let nb = UINavigationBar()
-        //nb.barTintColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         nb.translatesAutoresizingMaskIntoConstraints = false
         return nb
     }()
@@ -83,12 +85,9 @@ class UpdateInfoUsrController: UIViewController {
         tv.layer.borderColor = UIColor.lightGray.cgColor
         tv.layer.borderWidth = 1
         tv.layer.cornerRadius = 7
-        tv.isEditable = true
-        tv.isScrollEnabled = true
         tv.autocapitalizationType = .none
-        tv.isUserInteractionEnabled = true
-        tv.textAlignment = .center
-        tv.font = UIFont.boldSystemFont(ofSize: 18)
+        tv.textAlignment = .left
+        tv.font = UIFont.boldSystemFont(ofSize: 25)
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
@@ -101,6 +100,7 @@ class UpdateInfoUsrController: UIViewController {
         DetectEnviroment()
         SettingNavBar()
         SettingsObjects()
+        PrepareMainInfo()
     }
     
     //detect enviroment
@@ -222,6 +222,17 @@ class UpdateInfoUsrController: UIViewController {
         BioTextView.backgroundColor = .systemGray
     }
     
+    
+    //load main info
+    fileprivate func PrepareMainInfo() {
+        DispatchQueue.main.async {
+            self.UsernameTxt.text = userData?.username
+            self.FirstnameTxt.text = userData?.first_name
+            self.LastnameTxt.text = userData?.last_name
+            self.BioTextView.text = userData?.bio
+        }
+    }
+    
     //cancel update
     @objc func CancelEdit() {
         self.dismiss(animated: true, completion: nil)
@@ -229,16 +240,18 @@ class UpdateInfoUsrController: UIViewController {
     
     //Update info profile
     @objc func SaveInfo() {
+        
         //disable btn
         SaveBtn.isEnabled = false
         
+        //prepare objects
         guard let username = UsernameTxt.text else {return}
         guard let first_name = FirstnameTxt.text else {return}
         guard let last_name = LastnameTxt.text else {return}
         guard let bio = BioTextView.text else {return}
         
        
-        //prueba
+        //call the update function
         NetworkingServices.UpdateInfoUsr(username: username, first_name: first_name, last_name: last_name, bio: bio)
         
         //dismiss controller
