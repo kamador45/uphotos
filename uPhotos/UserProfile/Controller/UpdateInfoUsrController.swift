@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class UpdateInfoUsrController: UIViewController {
+class UpdateInfoUsrController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     var InfoUser:UserModel?
     var userId:String?
@@ -44,6 +44,7 @@ class UpdateInfoUsrController: UIViewController {
         txt.placeholder = "Firstname"
         txt.borderStyle = .roundedRect
         txt.font = UIFont.boldSystemFont(ofSize: 15)
+        txt.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.7)
         txt.textColor = UIColor.black
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
@@ -54,7 +55,8 @@ class UpdateInfoUsrController: UIViewController {
         txt.placeholder = "Lastname"
         txt.borderStyle = .roundedRect
         txt.font = UIFont.boldSystemFont(ofSize: 15)
-        txt.textColor = UIColor.white
+        txt.textColor = UIColor.black
+        txt.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.7)
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -66,7 +68,7 @@ class UpdateInfoUsrController: UIViewController {
         txt.font = UIFont.boldSystemFont(ofSize: 15)
         txt.autocapitalizationType = .none
         txt.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.7)
-        txt.textColor = UIColor.white
+        txt.textColor = UIColor.black
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -87,18 +89,34 @@ class UpdateInfoUsrController: UIViewController {
         tv.layer.cornerRadius = 7
         tv.autocapitalizationType = .none
         tv.textAlignment = .left
+        tv.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.7)
         tv.font = UIFont.boldSystemFont(ofSize: 25)
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
+    }()
+    
+    //Create scrollview
+    let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.isUserInteractionEnabled = true
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
     //First function on load
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //assign delegates
+        UsernameTxt.delegate = self
+        FirstnameTxt.delegate = self
+        LastnameTxt.delegate = self
+        BioTextView.delegate = self
+        
         //execute functions
         DetectEnviroment()
         SettingNavBar()
+        SettingsMainViewScrollView()
         SettingsObjects()
         PrepareMainInfo()
     }
@@ -113,6 +131,7 @@ class UpdateInfoUsrController: UIViewController {
                 } else {
                     print("Dark has been detected")
                     self.view.backgroundColor = .black
+                    self.scrollView.backgroundColor = .black
                     self.AdaptObjectDarkMode()
                  }
              }
@@ -144,43 +163,61 @@ class UpdateInfoUsrController: UIViewController {
         navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
     
+    //adding scrollview to main view
+    fileprivate func SettingsMainViewScrollView() {
+        
+        //add to main view scrollview
+        view.addSubview(scrollView)
+        
+        //define constraint
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: navBar.bottomAnchor, constant: 0),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            scrollView.heightAnchor.constraint(equalToConstant: view.frame.height)
+        ])
+    }
+    
     //Settings objects
     fileprivate func SettingsObjects() {
         
         //views
         let views = UIView()
+        //views.backgroundColor = .white
+        views.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(HideKeyword)))
         views.translatesAutoresizingMaskIntoConstraints = false
         
         //add to main view
-        view.addSubview(views)
+        scrollView.addSubview(views)
         
         //define constraint
         NSLayoutConstraint.activate([
-            views.topAnchor.constraint(equalTo: navBar.bottomAnchor, constant: 0),
+            views.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 0),
             views.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             views.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-            views.heightAnchor.constraint(equalToConstant: view.frame.height / 2)
+            views.heightAnchor.constraint(equalToConstant: view.frame.height)
         ])
         
+
         //add to main view
         views.addSubview(MainInfoLbl)
-        
+
         //define constraint
         NSLayoutConstraint.activate([
-            MainInfoLbl.topAnchor.constraint(equalTo: views.topAnchor, constant: 20),
+            MainInfoLbl.topAnchor.constraint(equalTo: views.topAnchor, constant: 100),
             MainInfoLbl.leftAnchor.constraint(equalTo: views.leftAnchor, constant: 20)
         ])
-        
+
         //create stackview
         let stackView = UIStackView(arrangedSubviews: [UsernameTxt,FirstnameTxt,LastnameTxt])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         stackView.spacing = 10
-        
+
         //add to main view
         views.addSubview(stackView)
-        
+
         //define constraint
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: MainInfoLbl.topAnchor, constant: 50),
@@ -188,19 +225,19 @@ class UpdateInfoUsrController: UIViewController {
             stackView.rightAnchor.constraint(equalTo: views.rightAnchor, constant: -20),
             stackView.heightAnchor.constraint(equalToConstant: 150)
         ])
-        
+
         //add to main view
         views.addSubview(BioLbl)
-        
+
         //define constraint
         NSLayoutConstraint.activate([
             BioLbl.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20),
             BioLbl.leftAnchor.constraint(equalTo: stackView.leftAnchor, constant: 0)
         ])
-        
+
         //add to main view
         views.addSubview(BioTextView)
-        
+
         //define constraint
         NSLayoutConstraint.activate([
             BioTextView.topAnchor.constraint(equalTo: BioLbl.bottomAnchor, constant: 20),
@@ -250,11 +287,31 @@ class UpdateInfoUsrController: UIViewController {
         guard let last_name = LastnameTxt.text else {return}
         guard let bio = BioTextView.text else {return}
         
-       
         //call the update function
         NetworkingServices.UpdateInfoUsr(username: username, first_name: first_name, last_name: last_name, bio: bio)
         
         //dismiss controller
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    //try to hide keyword
+    @objc fileprivate func HideKeyword() {
+        UIView.animate(withDuration: 0.6) {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            self.view.endEditing(true)
+        }
+    }
+    
+    //Execute scrollview to uitextview
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        UIView.animate(withDuration: 0.6) {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 140)
+        }
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.6) {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 90)
+        }
     }
 }

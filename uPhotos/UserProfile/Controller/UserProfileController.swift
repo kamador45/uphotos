@@ -11,6 +11,9 @@ import UIKit
 
 class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    var menuView = MenuView()
+    let height:CGFloat = 325
+    
     //Access to model user
     var InfoUser: UserModel?
     
@@ -46,6 +49,15 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             collectionView.addSubview(RefreshControl)
         }
         
+        //detect style to add menu style
+        if #available(iOS 12, *) {
+            if self.traitCollection.userInterfaceStyle == .light {
+                self.AddLightMenu()
+            } else {
+                self.AddDarkMenu()
+            }
+        }
+        
         //register view on controller
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: header_id)
         
@@ -54,7 +66,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //call functions
         DescargaNewInfoUsr()
-        BtnLogOut()
+        ManageActionsControllers()
     }
     
     //Chance enviroment when dark or light has been detected
@@ -64,14 +76,17 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
                 if self.traitCollection.userInterfaceStyle == .light {
                     print("light has been detected")
                     self.collectionView.backgroundColor = .white
+                    self.AddLightMenu()
                } else {
                     print("Dark has been detected")
                     self.collectionView.backgroundColor = .black
+                    self.AddDarkMenu()
                }
            }
         }
     }
     
+    //manage fetch data
     @objc fileprivate func Fetch() {
         ManageRefresh()
         collectionView.reloadData()
@@ -166,12 +181,95 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     }
     
     //Add icon to close session btn
-    fileprivate func BtnLogOut() {
-        
-        let img = UIImage(named: "logout.png")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: img?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(LogoutSession))
+    fileprivate func AddLightMenu() {
+        let darkIcon = UIImage(named: "menu-dark.png")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: darkIcon?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(self.loadMenu))
     }
     
+    //Add dark menu
+    fileprivate func AddDarkMenu() {
+        let lightIcon = UIImage(named: "menu-light.png")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: lightIcon?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(self.loadMenu))
+    }
+    
+    
+    //Define bbackground temporal
+    var transparentView = UIView()
+    
+    //Loading menu options
+    @objc fileprivate func loadMenu() {
+        
+        //share window
+        let window = UIApplication.shared.keyWindow
+        transparentView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        transparentView.frame = self.view.frame
+        window?.addSubview(transparentView)
+        let screenSize = UIScreen.main.bounds.size
+        menuView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: height)
+        window?.addSubview(menuView)
+        
+        //Define gesture to hide view
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(HideView))
+        
+        //Add gesture to TopBar to hide card
+        menuView.topBar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(HideView)))
+        
+        //Add gesture to transparentView
+        transparentView.addGestureRecognizer(tapGesture)
+        transparentView.alpha = 0
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+            self.transparentView.alpha = 0.5
+            self.menuView.frame = CGRect(x: 0, y: screenSize.height - self.height, width: screenSize.width, height: self.height)
+        }, completion: nil)
+    }
+    
+    //Load controller in modal
+    fileprivate func ManageActionsControllers() {
+        menuView.UpdateInfoContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(UpdateInfo)))
+        
+        menuView.EditPicContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(EditPic)))
+        
+        menuView.EditPortraitContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(EditPortrait)))
+        
+        menuView.LogoutContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(RequestLogout)))
+    }
+    
+    //Load update info user
+    @objc fileprivate func UpdateInfo() {
+        let editPro = UpdateInfoUsrController()
+        self.present(editPro, animated: true, completion: nil)
+        HideView()
+    }
+    
+    //Update profile pic
+    @objc fileprivate func EditPic() {
+        let updatePic = UpdateProfilePicController()
+        self.present(updatePic, animated: true, completion: nil)
+        HideView()
+    }
+    
+    //Update portrait
+    @objc fileprivate func EditPortrait() {
+        let updatePic = UpdatePortraitPic()
+        self.present(updatePic, animated: true, completion: nil)
+        HideView()
+    }
+    
+    @objc fileprivate func RequestLogout() {
+        LogoutSession()
+        HideView()
+    }
+    
+    //Hide MenuView
+    @objc func HideView() {
+        let screenSize = UIScreen.main.bounds.size
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+            self.transparentView.alpha = 0
+            self.menuView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: self.height)
+        }, completion: nil)
+    }
+    
+    //End session
     @objc fileprivate func LogoutSession() {
         
         //create alert controller

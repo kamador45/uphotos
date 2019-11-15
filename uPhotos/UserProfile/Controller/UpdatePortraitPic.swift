@@ -246,7 +246,7 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
         guard let userId = userData?.id else {return}
         
         //define the url
-        guard let url = URL(string: "http://192.168.0.11:1337/find/\(userId)") else {return}
+        guard let url = URL(string: "http://localhost:1337/find/\(userId)") else {return}
         
         NetworkingServices.getData(from: url) { (data, response, error) in
             guard let data = data else {return}
@@ -350,7 +350,7 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
         guard let id = userInfo?.id else {return}
         
         //network process
-        guard let url = URL(string: "http://192.168.0.11:1337/update_portrait/\(id)") else {return}
+        guard let url = URL(string: "http://localhost:1337/update_portrait/\(id)") else {return}
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = "POST"
         

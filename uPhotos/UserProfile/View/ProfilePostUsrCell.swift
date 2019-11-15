@@ -15,16 +15,6 @@ class ProfilePostUsrCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .systemPink
-        
-//        if #available(iOS 12, *) {
-//            if traitCollection.userInterfaceStyle == .light {
-//                print("Light detected")
-//                backgroundColor = .systemGray
-//            } else {
-//                print("Dark detected")
-//                backgroundColor = .systemPink
-//            }
-//        }
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -11,6 +11,7 @@ import UIKit
 
 class NetworkingServices {
     
+    //Init services
     private init() {}
     
     static func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
@@ -21,7 +22,7 @@ class NetworkingServices {
     static func DownloadMainInfoUsr(uid:String, completion:@escaping(UserModel) -> ()) {
         
         //Define the url
-        guard let url = URL(string: "http://192.168.0.11:1337/find/\(uid)") else {return}
+        guard let url = URL(string: "http://localhost:1337/find/\(uid)") else {return}
         
         //process to network
         NetworkingServices.getData(from: url) { (data, response, error) in
@@ -61,11 +62,12 @@ class NetworkingServices {
     
     //capture and prepare info to update
     static func UpdateInfoUsr(username:String, first_name:String, last_name:String, bio:String) {
+        
         //capture uid user on session
         guard let id = userData?.id else {return}
         
         //prepare url
-        guard let url = URL(string: "http://192.168.0.11:1337/update_info/\(id)") else {return}
+        guard let url = URL(string: "http://localhost:1337/update_info/\(id)") else {return}
         
         //prepare request url
         let request = NSMutableURLRequest(url: url)
@@ -78,14 +80,13 @@ class NetworkingServices {
         let body = "first_name=\(first_name)&last_name=\(last_name)&username=\(username)&bio=\(bio)"
         request.httpBody = body.data(using: .utf8)
         
-        
+        //Network process
         URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
             print(request)
             if let err = error {
                 print("Oops something had result bad ==>\(err)")
             } else {
                 do {
-
                     guard let data = data else {return}
                     let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! NSDictionary
                     print(json)

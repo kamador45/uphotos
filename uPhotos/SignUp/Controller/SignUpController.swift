@@ -131,6 +131,20 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         return sv
     }()
     
+    let containerBrand: UIView = {
+        let uv = UIView()
+        uv.isUserInteractionEnabled = true
+        uv.translatesAutoresizingMaskIntoConstraints = false
+        return uv
+    }()
+    
+    let containerFields: UIView = {
+        let uv = UIView()
+        uv.isUserInteractionEnabled = true
+        uv.translatesAutoresizingMaskIntoConstraints = false
+        return uv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -155,136 +169,161 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         
         //execute all functions
         CreateGradienteBackground()
-        SetObjectsView()
+        SettingsScrollObject()
+        SettingsMainObjects()
+        SettingsForm()
+        //SetObjectsView()
     }
     
-    //Settings objects
-    fileprivate func SetObjectsView() {
-        
-        //Add to main views
+    //settings main objects to create scrollview auto up and auto down
+    fileprivate func SettingsScrollObject() {
+        //add to main view
         view.addSubview(scrollView)
+        
+        view.backgroundColor = UIColor.lightGray
         
         //define constraint
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             scrollView.heightAnchor.constraint(equalToConstant: view.frame.height)
         ])
         
-        view.addSubview(brandApp)
-        view.addSubview(CopyRightApp)
+        //hide keyword
+        scrollView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(HideKeyword)))
         
+    }
+    
+    //Settings main objects
+    fileprivate func SettingsMainObjects() {
         
-        //Constraint
+        //adding container to main view
+        scrollView.addSubview(containerBrand)
+        
+        //define constraint
         NSLayoutConstraint.activate([
-            brandApp.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.height / 5),
-            brandApp.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
-            brandApp.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5)
+            containerBrand.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: view.frame.height/5),
+            containerBrand.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            containerBrand.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            containerBrand.heightAnchor.constraint(equalToConstant: 50)
         ])
         
+        
+        //adding brand to main view
+        containerBrand.addSubview(brandApp)
+        
+        //define constraint
+        NSLayoutConstraint.activate([
+            brandApp.centerYAnchor.constraint(equalTo: containerBrand.centerYAnchor),
+            brandApp.leftAnchor.constraint(equalTo: containerBrand.leftAnchor, constant: 5),
+            brandApp.rightAnchor.constraint(equalTo: containerBrand.rightAnchor, constant: -5)
+        ])
+        
+        //add copytight to main view
+        containerBrand.addSubview(CopyRightApp)
+        
+        //define constraint
         NSLayoutConstraint.activate([
             CopyRightApp.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10),
             CopyRightApp.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
-            CopyRightApp.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5),
+            CopyRightApp.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5)
         ])
+    }
+    
+    //Settings form
+    fileprivate func SettingsForm() {
         
+        //adding to main view
+        scrollView.addSubview(containerFields)
         
-        //Create secondary view
-        let SecondaryView = UIView()
-        SecondaryView.translatesAutoresizingMaskIntoConstraints = false
-        
-        //add to main view
-        view.addSubview(SecondaryView)
-
-        //Constraint View
+        //define constraint
         NSLayoutConstraint.activate([
-            SecondaryView.topAnchor.constraint(equalTo: brandApp.bottomAnchor, constant: 20),
-            SecondaryView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            SecondaryView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
-            SecondaryView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5),
-            SecondaryView.heightAnchor.constraint(equalToConstant: view.frame.height / 2)
+            containerFields.topAnchor.constraint(equalTo: containerBrand.bottomAnchor, constant: 10),
+            containerFields.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            containerFields.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            containerFields.heightAnchor.constraint(equalToConstant: 300)
         ])
         
-        //StackView firstname and lastname
+        //Create stackview
         let stackView = UIStackView(arrangedSubviews: [FirstnameTxt,LastnameTxt])
         stackView.axis = .horizontal
         stackView.spacing = 5
         stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
-
-        //Add to secondary view
-        SecondaryView.addSubview(stackView)
-
-        //Constraint
+        
+        //adding stackview to container fields
+        containerFields.addSubview(stackView)
+        
+        //define constraint
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: SecondaryView.topAnchor, constant: 10),
-            stackView.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5),
-            stackView.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
+            stackView.topAnchor.constraint(equalTo: containerFields.topAnchor, constant: 20),
+            stackView.leftAnchor.constraint(equalTo: containerFields.leftAnchor, constant: 5),
+            stackView.rightAnchor.constraint(equalTo: containerFields.rightAnchor, constant: -5),
             stackView.heightAnchor.constraint(equalToConstant: 50)
         ])
-
-        //stackview email
-        let StackViewEmail = UIStackView(arrangedSubviews: [EmailTxt])
-        StackViewEmail.axis = .vertical
-        StackViewEmail.spacing = 5
-        StackViewEmail.distribution = .fillEqually
-        StackViewEmail.translatesAutoresizingMaskIntoConstraints = false
-
-        //Add to secondary view
-        SecondaryView.addSubview(StackViewEmail)
-
-        //Constraint
+        
+        //creating second stackview
+        let stackView2 = UIStackView(arrangedSubviews: [EmailTxt])
+        stackView2.axis = .horizontal
+        stackView2.spacing = 5
+        stackView2.distribution = .fillEqually
+        stackView2.translatesAutoresizingMaskIntoConstraints = false
+        
+        //adding stackview2 to container fields
+        containerFields.addSubview(stackView2)
+        
+        //define constraint
         NSLayoutConstraint.activate([
-            StackViewEmail.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 5),
-            StackViewEmail.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5),
-            StackViewEmail.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
-            StackViewEmail.heightAnchor.constraint(equalToConstant: 50)
+            stackView2.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 5),
+            stackView2.leftAnchor.constraint(equalTo: containerFields.leftAnchor, constant: 5),
+            stackView2.rightAnchor.constraint(equalTo: containerFields.rightAnchor, constant: -5),
+            stackView2.heightAnchor.constraint(equalToConstant: 50)
         ])
-
-        //Create StackView
-        let StackViewUsr = UIStackView(arrangedSubviews: [UsernameTxt, PasswordTxt])
-        StackViewUsr.translatesAutoresizingMaskIntoConstraints = false
-        StackViewUsr.axis = .horizontal
-        StackViewUsr.distribution = .fillEqually
-        StackViewUsr.spacing = 5
-
-        //Add to secondary view
-        SecondaryView.addSubview(StackViewUsr)
-
-        //Constraint
+        
+        //Creating third stackview
+        let stackview3 = UIStackView(arrangedSubviews: [UsernameTxt,PasswordTxt])
+        stackview3.axis = .horizontal
+        stackview3.spacing = 5
+        stackview3.distribution = .fillEqually
+        stackview3.translatesAutoresizingMaskIntoConstraints = false
+        
+        //adding stactview third to main view
+        containerFields.addSubview(stackview3)
+        
+        //define constraint
         NSLayoutConstraint.activate([
-            StackViewUsr.topAnchor.constraint(equalTo: StackViewEmail.bottomAnchor, constant: 5),
-            StackViewUsr.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5),
-            StackViewUsr.rightAnchor.constraint(equalTo: SecondaryView.rightAnchor, constant: -5),
-            StackViewUsr.heightAnchor.constraint(equalToConstant: 50)
+            stackview3.topAnchor.constraint(equalTo: stackView2.bottomAnchor, constant: 5),
+            stackview3.leftAnchor.constraint(equalTo: containerFields.leftAnchor, constant: 5),
+            stackview3.rightAnchor.constraint(equalTo: containerFields.rightAnchor, constant: -5),
+            stackview3.heightAnchor.constraint(equalToConstant: 50)
         ])
-
-        //Add to Secondary View
-        SecondaryView.addSubview(SignUpBtn)
-
-        //Constraint
+        
+        //adding Sign Up button to main view
+        containerFields.addSubview(SignUpBtn)
+        
+        //define constraint
         NSLayoutConstraint.activate([
-            SignUpBtn.topAnchor.constraint(equalTo: StackViewUsr.bottomAnchor, constant: 5),
-            SignUpBtn.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5)
+            SignUpBtn.topAnchor.constraint(equalTo: stackview3.bottomAnchor, constant: 5),
+            SignUpBtn.leftAnchor.constraint(equalTo: stackview3.leftAnchor, constant: 5)
         ])
-
-        //Add to Secondary View
-        SecondaryView.addSubview(OrLbl)
-
-        //Constraint
+        
+        //adding msg to main view
+        containerFields.addSubview(OrLbl)
+        
+        //define constraint
         NSLayoutConstraint.activate([
             OrLbl.topAnchor.constraint(equalTo: SignUpBtn.bottomAnchor, constant: 5),
-            OrLbl.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5)
+            OrLbl.leftAnchor.constraint(equalTo: stackview3.leftAnchor, constant: 5),
         ])
-
-        //Add SignIn btn to secondary views
-        SecondaryView.addSubview(SignInBtn)
-
-        //Constraint
+        
+        //adding Sign In button to main view
+        containerFields.addSubview(SignInBtn)
+        
+        //define constraint
         NSLayoutConstraint.activate([
             SignInBtn.topAnchor.constraint(equalTo: OrLbl.bottomAnchor, constant: 5),
-            SignInBtn.leftAnchor.constraint(equalTo: SecondaryView.leftAnchor, constant: 5),
+            SignInBtn.leftAnchor.constraint(equalTo: stackview3.leftAnchor, constant: 5)
         ])
     }
     
@@ -327,7 +366,7 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         } else {
             
             //Process for to Sign Up
-            guard let url = NSURL(string: "http://192.168.0.11:1337/sign_up/") else { return }
+            guard let url = NSURL(string: "http://localhost:1337/sign_up/") else { return }
             
             //Set url for to start request
             let request = NSMutableURLRequest(url: url as URL)
@@ -410,25 +449,16 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         self.view.layer.addSublayer(grandient)
     }
     
-    //Detect when user to begin to edit
+    //detect when user begin to write
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.4) {
-            self.scrollView.frame = self.view.bounds
-            self.view.frame = CGRect(x: 0, y: -100, width: self.view.frame.width, height: self.view.frame.height)
-        }
-    }
-    
-    //Detect when user has beed finished of edit
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.3) {
-            self.scrollView.frame = self.view.bounds
-            self.view.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+        UIView.animate(withDuration: 0.6) {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 55)
         }
     }
     
     //Active return button
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
+        //enable return button
         if let nextField = FirstnameTxt.superview?.viewWithTag(textField.tag + 1) as? UITextField {
             nextField.becomeFirstResponder()
         } else {
@@ -440,6 +470,11 @@ class SignUpController: UIViewController, UITextFieldDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
+    }
+    
+    @objc fileprivate func HideKeyword() {
+        self.view.endEditing(true)
+        print("tap detected")
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

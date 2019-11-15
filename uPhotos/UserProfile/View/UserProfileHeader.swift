@@ -90,26 +90,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         return cover
     }()
     
-    let ContainerBtn: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(red: 1/255, green: 1/255, blue: 1/255, alpha: 0.6)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 30 / 2
-        view.layer.borderColor = UIColor.white.cgColor
-        view.layer.borderWidth = 2
-        view.layer.zPosition = 5
-        return view
-    }()
-    
-    let EditProfile: UIButton = {
-        let btn = UIButton(type: .system)
-        btn.setTitle("•••", for: .normal)
-        btn.tintColor = UIColor.white
-        btn.clipsToBounds = true
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        return btn
-    }()
-    
     //btn follow user
     lazy var FollowUsr: UIButton = {
         let btn = UIButton(type: .system)
@@ -167,7 +147,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         let btn = UIButton(type: .system)
         let img = UIImage(named: "grid.png")
         btn.setImage(img, for: .normal)
-        btn.tintColor = UIColor.black
         btn.addTarget(self, action: #selector(ChooseGrid), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
@@ -178,7 +157,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         let btn = UIButton(type: .system)
         let img = UIImage(named: "list.png")
         btn.setImage(img, for: .normal)
-        btn.tintColor = UIColor(white: 0, alpha: 0.1)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.addTarget(self, action: #selector(ChooseList), for: .touchUpInside)
         return btn
@@ -187,7 +165,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     //Collection Pics
     let CollectionPicLbl: UILabel = {
         let lbl = UILabel()
-        lbl.textColor = UIColor.black
         lbl.text = "My collections"
         lbl.textAlignment = .center
         lbl.font = UIFont.boldSystemFont(ofSize: 17)
@@ -204,12 +181,12 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         SetObjects()
         SettingsStadisticUsr()
         SettingsToolBar()
-        LoadOptions()
     }
 
     var userInfoProfile: UserModel? {
         didSet {
             DispatchQueue.main.async {
+                
                 //download and set profile pic
                 guard let urlProfile = self.userInfoProfile?.path_pic else {return}
                 self.Avatar.LoadImage(urlString: urlProfile)
@@ -271,10 +248,10 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         ])
         
         //define blur effect
-        let darkMode = UIBlurEffect(style: .dark)
-        let blurView = UIVisualEffectView(effect: darkMode)
+        let lightMode = UIBlurEffect(style: .light)
+        let blurView = UIVisualEffectView(effect: lightMode)
         blurView.frame = coverPortrait.bounds
-        blurView.alpha = 0.6
+        blurView.alpha = 0.4
         blurView.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 200)
         
         //Add to main view
@@ -328,26 +305,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
             BioLbl.centerXAnchor.constraint(equalTo: UsernameLbl.centerXAnchor),
             BioLbl.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
             BioLbl.rightAnchor.constraint(equalTo: rightAnchor, constant: -20)
-        ])
-        
-        //add to main view
-        addSubview(ContainerBtn)
-        
-        //define constraint
-        NSLayoutConstraint.activate([
-            ContainerBtn.topAnchor.constraint(equalTo: views.topAnchor, constant: 20),
-            ContainerBtn.widthAnchor.constraint(equalToConstant: 30),
-            ContainerBtn.heightAnchor.constraint(equalToConstant: 30),
-            ContainerBtn.rightAnchor.constraint(equalTo: views.rightAnchor, constant: -10)
-        ])
-        
-        //add to main view
-        ContainerBtn.addSubview(EditProfile)
-        
-        //define constraint
-        NSLayoutConstraint.activate([
-            EditProfile.centerXAnchor.constraint(equalTo: ContainerBtn.centerXAnchor),
-            EditProfile.centerYAnchor.constraint(equalTo: ContainerBtn.centerYAnchor)
         ])
     }
     
@@ -446,24 +403,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
             stackviews.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -10),
             stackviews.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0)
         ])
-        
-        
-        //detect darkmode
-        DispatchQueue.main.async {
-            if #available(iOS 12, *) {
-                if self.traitCollection.userInterfaceStyle == .light {
-                    topSeparator.backgroundColor = .systemGray
-                    bottomSeparator.backgroundColor = .systemGray
-               } else {
-                   topSeparator.backgroundColor = .white
-                   bottomSeparator.backgroundColor = .white
-                   containerView.backgroundColor = .black
-                   self.CollectionPicLbl.textColor = .systemPink
-                   self.GridBtn.tintColor = .systemPink
-                   self.ListBtn.tintColor = .systemPink
-               }
-           }
-        }
     }
 
     
@@ -480,51 +419,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         print("list view")
     }
     
-    func LoadOptions() {
-        EditProfile.addTarget(self, action: #selector(LoadAlertController), for: .touchUpInside)
-    }
-    
-    @objc func LoadAlertController() {
-        //create alert controller
-        let actionSheet = UIAlertController(title: "Hey \(userData?.username ?? "")", message: "what do you want update?", preferredStyle: .actionSheet)
-        
-        //Load update profile pic
-        let updateProfilePic = UIAlertAction(title: "Update Profile Pic", style: .default) { (_) in
-            do {
-                let controller = UpdateProfilePicController()
-                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
-            }
-        }
-        
-        //update portraint pic
-        let updatePortrait = UIAlertAction(title: "Update Portrait", style: .default) { (_) in
-            do {
-                let controller = UpdatePortraitPic()
-                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
-                
-            }
-        }
-        
-        //update info user
-        let updateInfoUsr = UIAlertAction(title: "Update Info", style: .default) { (_) in
-            do {
-                let controller = UpdateInfoUsrController()
-                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
-            }
-        }
-        
-        let destructive = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
-        
-        //add actions to alert controller
-        actionSheet.addAction(updateProfilePic)
-        actionSheet.addAction(updatePortrait)
-        actionSheet.addAction(updateInfoUsr)
-        actionSheet.addAction(destructive)
-        
-        UIApplication.shared.keyWindow?.rootViewController?.present(actionSheet, animated: true, completion: nil)
-    }
-    
-    
     //try to adapt the view to enviroment actived
     func AdaptHeadertoLight() {
         //define new colors when dark mode it's active
@@ -533,11 +427,13 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         LastnameLbl.textColor = .black
         UsernameLbl.textColor = .black
         BioLbl.textColor = .systemGray
+        CollectionPicLbl.textColor = UIColor.black
+        GridBtn.tintColor = UIColor.black
+        ListBtn.tintColor = UIColor.black
     }
     
     //this function try to adapt interface
     func AdaptHeadertoDark() {
-
         //define new colors when dark mode it's active
         Avatar.layer.borderColor = UIColor.black.cgColor
         FirstnameLbl.textColor = .systemPink
@@ -547,6 +443,9 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         LikesLbl.textColor = .systemPink
         FollowersLbl.textColor = .systemPink
         FollowingLbl.textColor = .systemPink
+        CollectionPicLbl.textColor = .systemPink
+        GridBtn.tintColor = .systemPink
+        ListBtn.tintColor = .systemPink
     }
 
     required init?(coder aDecoder: NSCoder) {
