@@ -19,7 +19,6 @@ class NotifyController: UICollectionViewController {
     override func viewDidAppear(_ animated: Bool) {
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = true
-            
             navigationItem.title = "Notifications"
         }
     }

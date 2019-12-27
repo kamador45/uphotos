@@ -11,6 +11,7 @@ import UIKit
 
 class UpdateProfilePicController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    //Access to model
     var userInfo = userData
     
     //NavBar

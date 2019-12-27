@@ -110,18 +110,18 @@ class CreatePostController: UIViewController {
         guard let imageWidth = ImageToPost?.size.width else {return}
         guard let imageHeight = ImageToPost?.size.height else {return}
         
+        //disable button
+        navigationItem.rightBarButtonItem?.isEnabled = false
         
         //Check data
         if !(uid).isEmpty || !(text).isEmpty || !(postImg.images)!.isEmpty || imageWidth != 0 || imageHeight != 0 {
 
-            guard let url = URL(string: "http://localhost:1337/post/\(uid)") else {return}
+            guard let url = URL(string: "\(serverURL)post/\(uid)") else {return}
             let request = NSMutableURLRequest(url: url)
             request.httpMethod = "POST"
 
-
             let boundary = "Boundary-\(NSUUID().uuidString)"
             let imageData = postImg.jpegData(compressionQuality: 0.5)
-
 
             //detect if is nil
             if imageData == nil {
@@ -150,8 +150,23 @@ class CreatePostController: UIViewController {
                 } else {
                     guard let data = data else {return}
                     do {
+                        
+                        //Create serialization to object send from server
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! NSDictionary
-                        print(json)
+                        
+                        //cast to object to string
+                        guard let details = json["PostDetails"] as? String else {return}
+                        
+                        //detect if exist some data
+                        if !(details).isEmpty {
+                            print(json)
+                            DispatchQueue.main.async {
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                        } else {
+                            print("Arreglos vacions")
+                        }
+                        
                     } catch let errorJSON {
                         print("oops something had result bad errorJSON ==>\(errorJSON)")
                     }

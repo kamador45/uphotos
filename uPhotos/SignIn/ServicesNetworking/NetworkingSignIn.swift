@@ -16,8 +16,8 @@ class NetworkingSignIn {
     //Request to sign in and create session
     static func SignIn(username:String, password:String) {
         
-        //define url
-        guard let url = URL(string: "http://localhost:1337/sign_in/") else {return}
+        //define url to use
+        guard let url = URL(string: "\(serverURL)sign_in/") else {return}
         
         //Check if exist any data
         if username.isEmpty || password.isEmpty {

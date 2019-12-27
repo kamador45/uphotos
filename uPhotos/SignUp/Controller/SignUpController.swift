@@ -366,7 +366,7 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         } else {
             
             //Process for to Sign Up
-            guard let url = NSURL(string: "http://localhost:1337/sign_up/") else { return }
+            guard let url = NSURL(string: "\(serverURL)sign_up/") else { return }
             
             //Set url for to start request
             let request = NSMutableURLRequest(url: url as URL)

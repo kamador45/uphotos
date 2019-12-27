@@ -74,7 +74,7 @@ class SignInController: UIViewController, UITextFieldDelegate {
         guard let password = signInView.PasswordTxt.text else {return}
         
         //call to network request
-        NetworkingSignIn.SignIn(username: username.lowercased(), password: password.lowercased())
+        NetworkingSignIn.SignIn(username: username, password: password)
     }
     
     

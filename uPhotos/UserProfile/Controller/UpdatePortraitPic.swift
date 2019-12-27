@@ -11,7 +11,7 @@ import UIKit
 
 class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    //access to diccionary
+    //access to model
     var userInfo = userData
     
     //NavBar

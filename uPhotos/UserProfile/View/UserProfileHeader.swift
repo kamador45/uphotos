@@ -12,9 +12,8 @@ import UIKit
 class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
     //portrait photo
-    let Portrait: DownloadImage = {
-        let img = UIImage(named: "portrait.png")
-        let imv = DownloadImage(image: img)
+    let Portrait: UIImageView = {
+        let imv = UIImageView()
         imv.contentMode = .scaleAspectFill
         imv.clipsToBounds = true
         imv.translatesAutoresizingMaskIntoConstraints = false
@@ -22,9 +21,8 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     }()
 
     //User avatar
-    let Avatar: DownloadImage = {
-        let img = UIImage(named: "user_avatar.png")
-        let ava = DownloadImage(image: img)
+    let Avatar: UIImageView = {
+        let ava = UIImageView()
         ava.contentMode = .scaleAspectFill
         ava.layer.cornerRadius = 7
         ava.layer.borderWidth = 3
@@ -35,17 +33,7 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         return ava
     }()
     
-    let FirstnameLbl: UILabel = {
-        let lbl = UILabel()
-        lbl.textAlignment = .center
-        lbl.textColor = .black
-        lbl.font = UIFont.boldSystemFont(ofSize: 20)
-        lbl.numberOfLines = 0
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        return lbl
-    }()
-    
-    let LastnameLbl: UILabel = {
+    let FullnameLbl: UILabel = {
         let lbl = UILabel()
         lbl.textAlignment = .center
         lbl.textColor = .black
@@ -189,21 +177,41 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
                 
                 //download and set profile pic
                 guard let urlProfile = self.userInfoProfile?.path_pic else {return}
-                self.Avatar.LoadImage(urlString: urlProfile)
-
-                //download portrait pic
+                let urls = NSURL(string: urlProfile)!
+                let datas = try? Data(contentsOf: urls as URL)
+            
+                //check if exist some data
+                if datas != nil {
+                    DispatchQueue.main.async {
+                        self.Avatar.image = UIImage(data: datas!)
+                    }
+                } else {
+                    let img = UIImage(named: "user_avatar.png")
+                    self.Avatar.image = img
+                }
+                
+                //download and set portrait pic
                 guard let urlPortrait = self.userInfoProfile?.path_portrait else {return}
-                self.Portrait.LoadImage(urlString: urlPortrait)
+                let urls_portraits = NSURL(string: urlPortrait)!
+                let data_portrait = try? Data(contentsOf: urls_portraits as URL)
+                
+                //check if exist some data
+                if data_portrait != nil {
+                    DispatchQueue.main.async {
+                        self.Portrait.image = UIImage(data: data_portrait!)
+                    }
+                } else {
+                    let img = UIImage(named: "portrait.png")
+                    self.Portrait.image = img
+                }
                 
                 //safe statement
-                guard let firstname = self.userInfoProfile?.first_name else {return}
-                guard let lastname = self.userInfoProfile?.last_name else {return}
+                guard let fullname = self.userInfoProfile?.fullname else {return}
                 guard let username = self.userInfoProfile?.username else {return}
                 guard let bio = self.userInfoProfile?.bio else {return}
 
                 //Show info send from server
-                self.FirstnameLbl.text = firstname
-                self.LastnameLbl.text = lastname
+                self.FullnameLbl.text = fullname
                 self.UsernameLbl.text = username
                 self.BioLbl.text = bio
             }
@@ -272,10 +280,10 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         ])
         
         //stackview
-        let stackview = UIStackView(arrangedSubviews: [FirstnameLbl,LastnameLbl])
+        let stackview = UIStackView(arrangedSubviews: [FullnameLbl])
         stackview.distribution = .fillEqually
         stackview.axis = .horizontal
-        stackview.spacing = -4
+        stackview.spacing = 0
         stackview.translatesAutoresizingMaskIntoConstraints = false
         
         //add to main view
@@ -423,8 +431,7 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     func AdaptHeadertoLight() {
         //define new colors when dark mode it's active
         Avatar.layer.borderColor = UIColor.white.cgColor
-        FirstnameLbl.textColor = .black
-        LastnameLbl.textColor = .black
+        FullnameLbl.textColor = .black
         UsernameLbl.textColor = .black
         BioLbl.textColor = .systemGray
         CollectionPicLbl.textColor = UIColor.black
@@ -436,8 +443,7 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     func AdaptHeadertoDark() {
         //define new colors when dark mode it's active
         Avatar.layer.borderColor = UIColor.black.cgColor
-        FirstnameLbl.textColor = .systemPink
-        LastnameLbl.textColor = .systemPink
+        FullnameLbl.textColor = .systemPink
         UsernameLbl.textColor = .systemPink
         BioLbl.textColor = .systemPink
         LikesLbl.textColor = .systemPink

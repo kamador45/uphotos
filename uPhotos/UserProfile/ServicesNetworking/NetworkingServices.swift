@@ -22,7 +22,7 @@ class NetworkingServices {
     static func DownloadMainInfoUsr(uid:String, completion:@escaping(UserModel) -> ()) {
         
         //Define the url
-        guard let url = URL(string: "http://localhost:1337/find/\(uid)") else {return}
+        guard let url = URL(string: "\(serverURL)find/\(uid)") else {return}
         
         //process to network
         NetworkingServices.getData(from: url) { (data, response, error) in
@@ -67,7 +67,7 @@ class NetworkingServices {
         guard let id = userData?.id else {return}
         
         //prepare url
-        guard let url = URL(string: "http://localhost:1337/update_info/\(id)") else {return}
+        guard let url = URL(string: "\(serverURL)update_info/\(id)") else {return}
         
         //prepare request url
         let request = NSMutableURLRequest(url: url)
