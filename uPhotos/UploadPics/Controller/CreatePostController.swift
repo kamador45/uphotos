@@ -109,72 +109,19 @@ class CreatePostController: UIViewController {
         guard let uid = userData?.id else {return}
         guard let imageWidth = ImageToPost?.size.width else {return}
         guard let imageHeight = ImageToPost?.size.height else {return}
+        let createdAt = Date().timeIntervalSince1970 //Settings date in UNIX Format
         
         //disable button
         navigationItem.rightBarButtonItem?.isEnabled = false
         
         //Check data
         if !(uid).isEmpty || !(text).isEmpty || !(postImg.images)!.isEmpty || imageWidth != 0 || imageHeight != 0 {
-
-            guard let url = URL(string: "\(serverURL)post/\(uid)") else {return}
-            let request = NSMutableURLRequest(url: url)
-            request.httpMethod = "POST"
-
-            let boundary = "Boundary-\(NSUUID().uuidString)"
-            let imageData = postImg.jpegData(compressionQuality: 0.5)
-
-            //detect if is nil
-            if imageData == nil {
-                return
-            }
-
-            //settings value in multipart form data
-            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-            //Prepare params to send to server
-            let params = [
-                "id":uid,
-                "caption":text,
-                "imageWidth":imageWidth,
-                "imageHeight":imageHeight
-                ] as [String : Any]
-
-            //define body
-            request.httpBody = NetworkingPost.createBodyWithParams(parameters:params,filePathKey: "file", imageDataKey: imageData! as NSData, boundary: boundary) as Data
-
-            //Send parameters
-            let session = URLSession.shared
-            let dataTask = session.dataTask(with: request as URLRequest) { (data, response, error) in
-                if let err = error {
-                    print("Oops something had resulted bad ==>\(err)")
-                } else {
-                    guard let data = data else {return}
-                    do {
-                        
-                        //Create serialization to object send from server
-                        let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! NSDictionary
-                        
-                        //cast to object to string
-                        guard let details = json["PostDetails"] as? String else {return}
-                        
-                        //detect if exist some data
-                        if !(details).isEmpty {
-                            print(json)
-                            DispatchQueue.main.async {
-                                self.dismiss(animated: true, completion: nil)
-                            }
-                        } else {
-                            print("Arreglos vacions")
-                        }
-                        
-                    } catch let errorJSON {
-                        print("oops something had result bad errorJSON ==>\(errorJSON)")
-                    }
-                }
-            }
-
-            //resume
-            dataTask.resume()
+            
+            //Load petition to make request to server
+            NetworkingPost.CreatePostNetwork(uid: uid, Caption: text, PostImg: postImg, ImageWidth: Int(imageWidth), ImageHeight: Int(imageHeight), created: createdAt)
+            
+            //auto dissmis
+            self.dismiss(animated: true, completion: nil)
         }
     }
     

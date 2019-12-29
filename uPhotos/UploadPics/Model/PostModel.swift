@@ -8,21 +8,11 @@
 
 import Foundation
 
-struct PostModel: Codable {
+struct PostModel:Codable {
     
     //define items diccionary
     let id: String
-    let caption: String
-    let img_path: String
-    let imageWidth: Int
-    let imageHeight: Int
+    let user: UserModel
     
     //define diccionary
-    init(uid: String, dict:[String:Any]) {
-        self.id = uid
-        self.caption = dict["caption"] as? String ?? ""
-        self.img_path = dict["img_path"] as? String ?? ""
-        self.imageWidth = dict["imageWidth"] as! Int
-        self.imageHeight = dict["imageHeight"] as! Int
-    }
 }

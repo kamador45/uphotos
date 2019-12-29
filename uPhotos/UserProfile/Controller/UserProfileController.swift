@@ -17,6 +17,9 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     //Access to model user
     var InfoUser: UserModel?
     
+    //Access to model post
+    var PostUsr: PostModel?
+    
     //receive id user
     var userId:String?
     
@@ -66,6 +69,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //call functions
         DescargaNewInfoUsr()
+        DownloadPostUsr()
         ManageActionsControllers()
     }
     
@@ -104,6 +108,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     //Download info user
     fileprivate func DescargaUsrInfo() {
+        
         //get id on current session
          let uid = userId ?? (userData?.id ?? "")
          
@@ -112,12 +117,27 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             DispatchQueue.main.async {
                //accede a la info del usuario
                self.InfoUser = user
-               print(user)
                let navBar = self.InfoUser?.username
                self.navigationItem.title = navBar
             }
         }
      }
+    
+    //Download post created by user
+    fileprivate func DownloadPostUsr() {
+        
+        //Access to id
+        let uid = userId ?? (userData?.id ?? "")
+        print("encontre esto ==>\(uid)")
+        
+        NetworkingPost.DownloadPostByUsr(uid: uid) { (post) in
+            DispatchQueue.main.async {
+                self.PostUsr = post
+                print(post)
+            }
+        }
+        
+    }
     
     //Header settings
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

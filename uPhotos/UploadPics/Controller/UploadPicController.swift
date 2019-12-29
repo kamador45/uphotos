@@ -96,7 +96,7 @@ class UploadPicController: UICollectionViewController, UICollectionViewDelegateF
         } else if status == .denied {
             let alert = UIAlertController(title: "Photos", message: "Would like to access to your photos", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
+                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
             }))
             
             //Load settings app
@@ -110,7 +110,7 @@ class UploadPicController: UICollectionViewController, UICollectionViewDelegateF
         } else {
             let alert = UIAlertController(title: "Check", message: "Check your permissions", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
+                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
             }))
             
             //Load settings app

@@ -30,14 +30,19 @@ class NetworkingServices {
                 print("Ocurrio un error con el nuevo metodo de descarga ==\(err)")
             } else {
                 do {
-                    guard let data = data else {return}
-                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
-                    guard let idUsr = json!["id"] as? String else {return}
                     
+                    guard let data = data else {return}
+                    
+                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
+                    
+                    print(json)
+                    
+                    guard let idUsr = json!["id"] as? String else {return}
+
                     if !(idUsr).isEmpty {
                         let newDictionary = UserModel(uid: idUsr, dict: json as! [String : Any])
-                        
-                        
+
+
                         //encode objects receive from server
                         UserDefaults.standard.set(try? PropertyListEncoder().encode(newDictionary), forKey: "parseJSON")
 
@@ -49,8 +54,8 @@ class NetworkingServices {
 
                         //Store all info in global var
                         userData = userInfo
-                        
-                        print(userInfo)
+
+                        print("Encontre esta informacion del usuario ==>\(userInfo)")
                     }
                     
                 } catch let errorJSON {
