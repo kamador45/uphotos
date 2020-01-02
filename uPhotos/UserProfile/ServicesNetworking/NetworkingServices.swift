@@ -35,8 +35,6 @@ class NetworkingServices {
                     
                     let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
                     
-                    print(json)
-                    
                     guard let idUsr = json!["id"] as? String else {return}
 
                     if !(idUsr).isEmpty {
@@ -54,8 +52,6 @@ class NetworkingServices {
 
                         //Store all info in global var
                         userData = userInfo
-
-                        print("Encontre esta informacion del usuario ==>\(userInfo)")
                     }
                     
                 } catch let errorJSON {

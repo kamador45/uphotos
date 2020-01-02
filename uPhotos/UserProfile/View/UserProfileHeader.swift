@@ -255,16 +255,6 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
             coverPortrait.heightAnchor.constraint(equalToConstant: 200)
         ])
         
-        //define blur effect
-        let lightMode = UIBlurEffect(style: .light)
-        let blurView = UIVisualEffectView(effect: lightMode)
-        blurView.frame = coverPortrait.bounds
-        blurView.alpha = 0.4
-        blurView.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 200)
-        
-        //Add to main view
-        addSubview(blurView)
-        
         //Add to main view
         views.addSubview(Avatar)
         

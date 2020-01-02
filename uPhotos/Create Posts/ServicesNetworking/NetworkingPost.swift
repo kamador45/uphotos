@@ -93,6 +93,9 @@ class NetworkingPost {
         //Network request
         NetworkingPost.getPosts(from: url as URL) { (data, response, error) in
             
+            //gets user id in session
+            //guard let uid = userData?.id else {return}
+            
             //Detect any error
             if let err = error {
                 print("Oops something has been bad ==>\(err)")
@@ -103,13 +106,41 @@ class NetworkingPost {
                     //get data
                     guard let data = data else {return}
                     
-                    //show all data downloaded
-                    print("Encontre estos datos ==>\(data)")
+                    //serialization data
+                    guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary else {return}
                     
-                    //define json serializer
-                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
+                    //define key of objects
+                    let results = json.value(forKey: "results") as! [AnyObject]
                     
-                    print("json objects ==>\(json)")
+                    
+                    //detect if exist data
+                    if !(results).isEmpty {
+                        
+                        //Loop to objects send from server
+                        for x in results {
+                            
+                            //receive objects
+                            let objetos = x["PostDetails"]
+                            
+                            //send to model
+                            let newDicc = PostModel(uid: uid, diccPost: objetos as! [String : Any])
+                            
+                            //Assign to global var
+                            postDataUsr = newDicc
+                            
+                            //print("Nuevo diccionario ===>\(newDicc)")
+                        }
+                    }
+                    
+                    
+//                    let prueba = json.value(forKey: "results") as! [AnyObject]
+//                    let x = prueba[0] as! NSDictionary
+//
+//                    print(x)
+                    
+//                    let prueba = json as? [String:Any]
+                    
+                    
                     
                 } catch let errorJSON {
                     print("Oops something in JSON convert has been bad ==>\(errorJSON)")

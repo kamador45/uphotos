@@ -32,9 +32,8 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
     }()
     
     //Avatar
-    lazy var Avatar: DownloadImage = {
-        let img = UIImage(named: "user_avatar.png")
-        let ava = DownloadImage(image: img)
+    lazy var Avatar: UIImageView = {
+        let ava = UIImageView()
         ava.contentMode = .scaleAspectFill
         ava.layer.cornerRadius = 7
         ava.layer.borderColor = UIColor.lightGray.cgColor
@@ -227,7 +226,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         guard let userId = userData?.id else {return}
         
         //define the url
-        guard let url = URL(string: "http://localhost:1337/find/\(userId)") else {return}
+        guard let url = URL(string: "\(serverURL)find/\(userId)") else {return}
         
         NetworkingServices.getData(from: url) { (data, response, error) in
             guard let data = data else {return}
@@ -252,7 +251,22 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
                             self.FirstnameLbl.text = parseJSON.first_name
                             self.LastnameLbl.text = parseJSON.last_name
                             self.BioTextView.text = parseJSON.bio
-                            self.Avatar.LoadImage(urlString: parseJSON.path_pic)
+                        }
+                    }
+                    
+                    guard let urlProfilePic = self.userInfo?.path_pic else {return}
+                    let urls = NSURL(string: urlProfilePic)!
+                    let datas = try? Data(contentsOf: urls as URL)
+                   
+                    //check if exist some data
+                    if datas != nil {
+                        DispatchQueue.main.async {
+                            self.Avatar.image = UIImage(data: datas!)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            let img = UIImage(named: "user_avatar.png")
+                            self.Avatar.image = img
                         }
                     }
                     
@@ -334,7 +348,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         guard let id = userInfo?.id else {return}
         
         //network process
-        guard let url = URL(string: "http://localhost:1337/update_profile_pic/\(id)") else {return}
+        guard let url = URL(string: "\(serverURL)update_profile_pic/\(id)") else {return}
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = "POST"
         

@@ -32,9 +32,8 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
     }()
     
     //Avatar
-    lazy var Avatar: DownloadImage = {
-        let img = UIImage(named: "user_avatar.png")
-        let ava = DownloadImage(image: img)
+    lazy var Avatar: UIImageView = {
+        let ava = UIImageView()
         ava.contentMode = .scaleAspectFill
         ava.layer.cornerRadius = 7
         ava.layer.borderColor = UIColor.white.cgColor
@@ -46,9 +45,8 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
     }()
     
     //portrait photo
-    let Portrait: DownloadImage = {
-        let img = UIImage(named: "portrait.png")
-        let imv = DownloadImage(image: img)
+    let Portrait: UIImageView = {
+        let imv = UIImageView()
         imv.contentMode = .scaleAspectFill
         imv.clipsToBounds = true
         imv.translatesAutoresizingMaskIntoConstraints = false
@@ -246,7 +244,7 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
         guard let userId = userData?.id else {return}
         
         //define the url
-        guard let url = URL(string: "http://localhost:1337/find/\(userId)") else {return}
+        guard let url = URL(string: "\(serverURL)find/\(userId)") else {return}
         
         NetworkingServices.getData(from: url) { (data, response, error) in
             guard let data = data else {return}
@@ -264,15 +262,48 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
                     //adapt all object to model
                     let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
                     
+                    //define url profile pic
+                    guard let urlProfilePic = self.userInfo?.path_pic else {return}
+                    let urlsProf = NSURL(string: urlProfilePic)!
+                    let datasProf = try? Data(contentsOf: urlsProf as URL)
+                    
+                    //check data
+                    if datasProf != nil {
+                        DispatchQueue.main.async {
+                            self.Avatar.image = UIImage(data: datasProf!)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            let img = UIImage(named: "user_avatar.png")
+                            self.Avatar.image = img
+                        }
+                    }
+                    
                     //compare id
                     if !(id).isEmpty {
                         DispatchQueue.main.async {
-                            self.Avatar.LoadImage(urlString: parseJSON.path_pic)
-                            self.Portrait.LoadImage(urlString: parseJSON.path_portrait)
+                            //self.Portrait.LoadImage(urlString: parseJSON.path_portrait)
                             self.FirstnameLbl.text = parseJSON.first_name
                             self.LastnameLbl.text = parseJSON.last_name
                             self.UsernameLbl.text = parseJSON.username
                             self.BioLbl.text = parseJSON.bio
+                        }
+                    }
+                    
+                    //create url
+                    guard let urlPortrait = self.userInfo?.path_portrait else {return}
+                    let urls = NSURL(string: urlPortrait)!
+                    let datas = try? Data(contentsOf: urls as URL)
+                    
+                    //check if exist data
+                    if datas != nil {
+                        DispatchQueue.main.async {
+                            self.Portrait.image = UIImage(data: datas!)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            let img = UIImage(named: "portrait.png")
+                            self.Portrait.image = img
                         }
                     }
                     
@@ -350,7 +381,7 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
         guard let id = userInfo?.id else {return}
         
         //network process
-        guard let url = URL(string: "http://localhost:1337/update_portrait/\(id)") else {return}
+        guard let url = URL(string: "\(serverURL)update_portrait/\(id)") else {return}
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = "POST"
         

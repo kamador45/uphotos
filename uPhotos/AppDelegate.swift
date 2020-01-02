@@ -11,10 +11,11 @@ import UIKit
 //manage data with global var
 var userData:UserModel?
 var postDataUsr:PostModel?
+
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
 //global address to server
-var serverURL = "http://10.9.45.237:1337/"
+var serverURL = "http://192.168.0.11:1337/"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

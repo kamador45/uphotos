@@ -26,6 +26,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     //header id
     let header_id = "header"
     let celdaId = "CeldaId"
+    let celdaPost = "celdaPost"
     
     var RefreshControl = UIRefreshControl()
     
@@ -123,22 +124,6 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         }
      }
     
-    //Download post created by user
-    fileprivate func DownloadPostUsr() {
-        
-        //Access to id
-        let uid = userId ?? (userData?.id ?? "")
-        print("encontre esto ==>\(uid)")
-        
-        NetworkingPost.DownloadPostByUsr(uid: uid) { (post) in
-            DispatchQueue.main.async {
-                self.PostUsr = post
-                print(post)
-            }
-        }
-        
-    }
-    
     //Header settings
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
@@ -170,7 +155,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     //define number of cells
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        return PostByUsr.count
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -187,12 +172,85 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         return CGSize(width: with, height: with)
     }
     
+    
+    //Load all post by user in cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         //re use the post pic cell
         let celda = collectionView.dequeueReusableCell(withReuseIdentifier: celdaId, for: indexPath) as! ProfilePostUsrCell
         
+        celda.PostData = PostByUsr[indexPath.item]
+        
         return celda
+    }
+    
+    
+    var PostByUsr = [PostModel]()
+
+    //Download post created by user
+    fileprivate func DownloadPostUsr() {
+
+        //Access to id
+        let uid = userId ?? (userData?.id ?? "")
+        print("encontre esto ==>\(uid)")
+        
+        guard let url = URL(string: "\(serverURL)find_posts/\(uid)") else {return}
+        
+        NetworkingPost.getPosts(from: url) { (data, response, error) in
+            //Detect any error
+                if let err = error {
+                    print("Oops something has been bad ==>\(err)")
+                } else {
+                    
+                    do {
+                        
+                        //get data
+                        guard let data = data else {return}
+                        
+                        //serialization data
+                        guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary else {return}
+                        
+                        //define key of objects
+                        let results = json.value(forKey: "results") as! [AnyObject]
+                        
+                        
+                        //detect if exist data
+                        if !(results).isEmpty {
+                            
+                            //Loop to objects send from server
+                            for x in results {
+                                
+                                //receive objects
+                                let objetos = x["PostDetails"]
+                                
+                                //send to model
+                                let newDicc = PostModel(uid: uid, diccPost: objetos as! [String : Any])
+                                
+                                //Assign to global var
+                                postDataUsr = newDicc
+                                
+                                self.PostByUsr.insert(postDataUsr!, at: 0)
+
+                                
+                                self.PostByUsr.sort { (p1, p2) -> Bool in
+                                    return p1.createAt.compare(p2.createAt) == .orderedDescending
+                                }
+                                
+                                print(self.PostByUsr)
+                                
+                                //print("Nuevo diccionario ===>\(newDicc)")
+                            }
+                            
+                            DispatchQueue.main.async {
+                                self.collectionView.reloadData()
+                            }
+                        }
+                        
+                    } catch let errorJSON {
+                        print("Oops something in JSON convert has been bad ==>\(errorJSON)")
+                }
+            }
+        }
     }
     
     //define size header
