@@ -45,6 +45,12 @@ class SignInController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.6) {
+            self.signInView.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+        }
+    }
+    
     //Active return button
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if let nextField = signInView.UsernameTxt.superview?.viewWithTag(textField.tag + 1) as? UITextField {

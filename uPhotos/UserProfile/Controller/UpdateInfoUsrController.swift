@@ -278,20 +278,26 @@ class UpdateInfoUsrController: UIViewController, UITextFieldDelegate, UITextView
     //Update info profile
     @objc func SaveInfo() {
         
-        //disable btn
-        SaveBtn.isEnabled = false
-        
         //prepare objects
         guard let username = UsernameTxt.text else {return}
         guard let first_name = FirstnameTxt.text else {return}
         guard let last_name = LastnameTxt.text else {return}
         guard let bio = BioTextView.text else {return}
         
-        //call the update function
-        NetworkingServices.UpdateInfoUsr(username: username, first_name: first_name, last_name: last_name, bio: bio)
+        //Check if exist some data
+        if !(username).isEmpty || !(first_name).isEmpty || !(last_name).isEmpty || !(bio).isEmpty {
+            
+            //call the update function
+            NetworkingServices.UpdateInfoUsr(username: username, first_name: first_name, last_name: last_name, bio: bio)
+            
+            //dismiss controller
+            self.dismiss(animated: true, completion: nil)
+        }
         
-        //dismiss controller
-        self.dismiss(animated: true, completion: nil)
+        //disable btn
+        SaveBtn.isEnabled = false
+        
+        //error message with animations
     }
     
     //try to hide keyword
