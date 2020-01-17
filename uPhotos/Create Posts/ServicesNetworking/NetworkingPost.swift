@@ -93,9 +93,6 @@ class NetworkingPost {
         //Network request
         NetworkingPost.getPosts(from: url as URL) { (data, response, error) in
             
-            //gets user id in session
-            //guard let uid = userData?.id else {return}
-            
             //Detect any error
             if let err = error {
                 print("Oops something has been bad ==>\(err)")
@@ -127,20 +124,8 @@ class NetworkingPost {
                             
                             //Assign to global var
                             postDataUsr = newDicc
-                            
-                            //print("Nuevo diccionario ===>\(newDicc)")
                         }
                     }
-                    
-                    
-//                    let prueba = json.value(forKey: "results") as! [AnyObject]
-//                    let x = prueba[0] as! NSDictionary
-//
-//                    print(x)
-                    
-//                    let prueba = json as? [String:Any]
-                    
-                    
                     
                 } catch let errorJSON {
                     print("Oops something in JSON convert has been bad ==>\(errorJSON)")

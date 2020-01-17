@@ -1,29 +1,29 @@
 //
-//  Networking.swift
+//  NetworkingSignUp.swift
 //  uPhotos
 //
-//  Created by Kevin Amador Rios on 10/29/19.
-//  Copyright © 2019 Kevin Amador Rios. All rights reserved.
+//  Created by Kevin Amador Rios on 1/5/20.
+//  Copyright © 2020 Kevin Amador Rios. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
-class NetworkingSignIn {
+class NetworkingSignUp {
     
     //start services
     init() {}
     
-    //Network request to sign in and create session
-    static func SignIn(username:String, password:String) {
+    //Network request to server
+    static func SignUp(firstname:String, lastname:String, email:String, username:String, password:String) {
         
-        //define url to use
-        guard let url = URL(string: "\(serverURL)sign_in/") else {return}
+        //Define url
+        guard let url = URL(string: "\(serverURL)sign_up/") else {return}
         
         //Check if exist any data
-        if username.isEmpty || password.isEmpty {
+        if firstname.isEmpty || lastname.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty {
             print("Los campos estan vacios")
         } else {
-            
             //create request
             let request = NSMutableURLRequest(url: url)
             
@@ -31,59 +31,58 @@ class NetworkingSignIn {
             request.httpMethod = "POST"
             
             //define body
-            let body = "username=\(username)&password=\(password)"
+            let body = "first_name=\(firstname)&last_name=\(lastname)&email=\(email)&username=\(username)&password=\(password)"
             request.httpBody = body.data(using: .utf8)
             
-            
-            //start request to server
+            //start services with server
             let session = URLSession.shared
             let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
                 
-                //store data
+                //get data
                 guard let data = data else {return}
                 
                 //detect any error
                 if let err = error {
-                    print("Oops something go bad ==>\(err)")
+                    print("Oops something has been bad ==>\(err)")
                 } else {
                     do {
-                        //cas to json
+                        //cast to json
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
                         
                         //access to object and create session
                         guard let id = json!["id"] as? String else {return}
                         
-                        //Convert diccionary to model
+                        //convert diccionary to model
                         let parseJSON = UserModel(uid: id, dict: json as! [String:Any])
                         
-                        //detect if exist some data
+                        //detect if exist any data
                         if !(id).isEmpty {
-                            print("I found this info ==>\(id)")
+                            print("I found this data ===>\(id)")
                             
-                            //Update info store in device
+                            //Encode objects receive data from server
                             UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
                             
-                            //convert all data in object
+                            //convert data to object
                             guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
                             
-                            //insert and decode all object in model
+                            //decode data to model
                             guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
                             
-                            //Store new info
+                            //store info in global vat
                             userData = userInfo
                             
-                            //create session
+                            //Create session
                             DispatchQueue.main.async {
                                 appDelegates.Login()
                             }
                         }
                     } catch let errorJSON {
-                        print("Oops something go bad in parseJSON ==>\(errorJSON)")
+                        print("Oops something has been result bad ==>\(errorJSON)")
                     }
                 }
             }
             
-            //create resume
+            //start services
             task.resume()
         }
     }

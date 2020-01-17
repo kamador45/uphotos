@@ -24,12 +24,4 @@ struct PostModel:Codable {
         let secondsFrom1970 = diccPost["createAt"] as? Double ?? 0
         self.createAt = Date(timeIntervalSince1970: secondsFrom1970)
     }
-//    init(uid: String, diccionaryPost:[String:Any]) {
-//        //assign values
-//        self.idUser = uid
-//        self.caption = diccionaryPost["caption"] as? String ?? ""
-//        self.img_url = diccionaryPost["img_path"] as? String ?? ""
-//        let secondsFrom1970 = diccionaryPost["createAt"] as? Double ?? 0
-//        self.createAt = Date(timeIntervalSince1970: secondsFrom1970)
-//    }
 }

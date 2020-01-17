@@ -99,7 +99,7 @@ class SignUpView: UIView {
         btn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 25)
         btn.titleLabel?.textAlignment = .left
         btn.tintColor = .white
-        //btn.addTarget(self, action: #selector(SignUpController.SignUp), for: .touchUpInside)
+        btn.addTarget(self, action: #selector(SignUpController.SignUp), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -124,38 +124,37 @@ class SignUpView: UIView {
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
-       
-       
-       let CopyRightApp: UILabel = {
-           let lbl = UILabel()
-           lbl.text = "μPhotos All right reserved © 2019."
-           lbl.textColor = UIColor.white
-           lbl.textAlignment = .center
-           lbl.font = UIFont.boldSystemFont(ofSize: 17)
-           lbl.translatesAutoresizingMaskIntoConstraints = false
-           return lbl
-       }()
-       
-       let scrollView: UIScrollView = {
-           let sv = UIScrollView()
-           sv.isUserInteractionEnabled = true
-           sv.translatesAutoresizingMaskIntoConstraints = false
-           return sv
-       }()
-       
-       let containerBrand: UIView = {
-           let uv = UIView()
-           uv.isUserInteractionEnabled = true
-           uv.translatesAutoresizingMaskIntoConstraints = false
-           return uv
-       }()
-       
-       let containerFields: UIView = {
-           let uv = UIView()
-           uv.isUserInteractionEnabled = true
-           uv.translatesAutoresizingMaskIntoConstraints = false
-           return uv
-       }()
+
+   let CopyRightApp: UILabel = {
+       let lbl = UILabel()
+       lbl.text = "μPhotos All right reserved © 2020."
+       lbl.textColor = UIColor.white
+       lbl.textAlignment = .center
+       lbl.font = UIFont.boldSystemFont(ofSize: 17)
+       lbl.translatesAutoresizingMaskIntoConstraints = false
+       return lbl
+   }()
+   
+   let scrollView: UIScrollView = {
+       let sv = UIScrollView()
+       sv.isUserInteractionEnabled = true
+       sv.translatesAutoresizingMaskIntoConstraints = false
+       return sv
+   }()
+   
+   let containerBrand: UIView = {
+       let uv = UIView()
+       uv.isUserInteractionEnabled = true
+       uv.translatesAutoresizingMaskIntoConstraints = false
+       return uv
+   }()
+   
+   let containerFields: UIView = {
+       let uv = UIView()
+       uv.isUserInteractionEnabled = true
+       uv.translatesAutoresizingMaskIntoConstraints = false
+       return uv
+   }()
     
     //init view
     override init(frame: CGRect) {
@@ -185,6 +184,7 @@ class SignUpView: UIView {
     
     //Settigns main objects to view
     fileprivate func SettingsMainObjects() {
+        
         //Add to main view
         scrollView.addSubview(containerBrand)
         
@@ -237,9 +237,6 @@ class SignUpView: UIView {
         
         //Add to main view
         scrollView.addSubview(containerFields)
-        
-        containerFields.layer.borderColor = UIColor.black.cgColor
-        containerFields.layer.borderWidth = 2
         
         //define constraint
         NSLayoutConstraint.activate([

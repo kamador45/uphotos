@@ -68,6 +68,11 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //register cell
         collectionView.register(ProfilePostUsrCell.self, forCellWithReuseIdentifier: celdaId)
         
+        //Settings display mode
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .never
+        }
+        
         //call functions
         DescargaNewInfoUsr()
         DownloadPostUsr()

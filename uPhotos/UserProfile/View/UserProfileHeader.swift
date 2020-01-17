@@ -180,7 +180,7 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
                 let urls = NSURL(string: urlProfile)!
                 let datas = try? Data(contentsOf: urls as URL)
             
-                //check if exist some data
+                //check if exist any data
                 if datas != nil {
                     DispatchQueue.main.async {
                         self.Avatar.image = UIImage(data: datas!)

@@ -11,6 +11,7 @@ import UIKit
 //manage data with global var
 var userData:UserModel?
 var postDataUsr:PostModel?
+var listUsers:SearchModel?
 
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 

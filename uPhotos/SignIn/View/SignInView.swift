@@ -93,7 +93,7 @@ class SignInView: UIView {
 
     let CopyRightApp: UILabel = {
         let lbl = UILabel()
-        lbl.text = "μPhotos All right reserved © 2019."
+        lbl.text = "μPhotos All right reserved © 2020."
         lbl.textColor = UIColor.white
         lbl.textAlignment = .center
         lbl.font = UIFont.boldSystemFont(ofSize: 17)
