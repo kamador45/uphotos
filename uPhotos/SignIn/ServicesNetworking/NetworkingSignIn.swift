@@ -19,6 +19,8 @@ class NetworkingSignIn {
         //define url to use
         guard let url = URL(string: "\(serverURL)sign_in/") else {return}
         
+        print(url)
+        
         //Check if exist any data
         if username.isEmpty || password.isEmpty {
             print("Los campos estan vacios")
@@ -34,7 +36,6 @@ class NetworkingSignIn {
             let body = "username=\(username)&password=\(password)"
             request.httpBody = body.data(using: .utf8)
             
-            
             //start request to server
             let session = URLSession.shared
             let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
@@ -47,21 +48,26 @@ class NetworkingSignIn {
                     print("Oops something go bad ==>\(err)")
                 } else {
                     do {
-                        //cas to json
+                        //cast to json
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
                         
                         //access to object and create session
-                        guard let id = json!["id"] as? String else {return}
+                        guard let parseJSON = json else {
+                            print("Error parsing JSON")
+                            return
+                        }
                         
-                        //Convert diccionary to model
-                        let parseJSON = UserModel(uid: id, dict: json as! [String:Any])
+                        //Access to object to data
+                        let id = parseJSON["id"]
                         
                         //detect if exist some data
-                        if !(id).isEmpty {
+                        if id != nil {
                             print("I found this info ==>\(id)")
                             
+                            let newDic = UserModel(uid: id as! String, dict: parseJSON as! [String : Any])
+                            
                             //Update info store in device
-                            UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+                            UserDefaults.standard.set(try? PropertyListEncoder().encode(newDic), forKey: "parseJSON")
                             
                             //convert all data in object
                             guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}

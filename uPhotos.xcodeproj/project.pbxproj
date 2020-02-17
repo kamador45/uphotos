@@ -103,13 +103,6 @@
 			path = ServicesNetworking;
 			sourceTree = "<group>";
 		};
-		1F418A74233011B700566E98 /* Global */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Global;
-			sourceTree = "<group>";
-		};
 		1FAD554A236921BA007A9B85 /* ServicesNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -328,7 +321,6 @@
 		1FF0103C2310A1620072006D /* uPhotos */ = {
 			isa = PBXGroup;
 			children = (
-				1F418A74233011B700566E98 /* Global */,
 				1FF0103D2310A1620072006D /* AppDelegate.swift */,
 				1FEE0EB02311F98E00EE1E29 /* UserProfile */,
 				1FEE0EAF2311F98500EE1E29 /* Notify */,

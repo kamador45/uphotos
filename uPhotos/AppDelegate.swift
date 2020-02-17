@@ -16,7 +16,7 @@ var listUsers:SearchModel?
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
 //global address to server
-var serverURL = "http://192.168.0.11:1337/"
+var serverURL = "http://192.168.1.166:1337/" //"http://192.168.0.11:1337/"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -28,11 +28,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         //load data content send from server
         guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else { return true }
-
         guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return true}
 
+        //store data
         userData = userInfo
-        
         
         //detect if exist session
         if userData != nil {

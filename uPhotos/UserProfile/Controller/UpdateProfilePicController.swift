@@ -62,7 +62,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Username"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.black
+        txt.textColor = UIColor.lightGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -72,7 +72,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Firstname"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.black
+        txt.textColor = UIColor.lightGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -81,7 +81,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Lastname"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.black
+        txt.textColor = UIColor.lightGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()

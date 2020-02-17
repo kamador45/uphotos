@@ -73,6 +73,8 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             navigationItem.largeTitleDisplayMode = .never
         }
         
+        print(userData)
+        
         //call functions
         DescargaNewInfoUsr()
         DownloadPostUsr()

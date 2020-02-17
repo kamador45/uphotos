@@ -91,44 +91,36 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         //network process
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             
-            //data
-            guard let data = data else {return}
-            
             //detect any error
             if let err = error {
                 print("Oops something has been result bad ==>\(err)")
             } else {
                 
                 do {
+                    //data
+                    guard let data = data else {return}
+                
+                    //cast to json
+                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
                     
-                    //json serialization
-                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
+                    //running every value and key
+                    json?.forEach({ (data) in
+                        let x = data
+                        guard let id = x["id"] as? String else {return}
+                        let listUsers = UserModel(uid: id, dict: x as! [String:Any])
+                        print(listUsers)
+                        self.users.append(listUsers)
+                    })
                     
-                    //receive value
-                    let results = json?.value(forKey: "results") as! [AnyObject]
+                    print(self.users)
                     
-                    
-                    //gets id in session
-                    guard let id = userData?.id else {return}
-                    
-                    
-                    //check if exist any data
-                    if !(results).isEmpty {
-                        results.forEach { (data) in
-                            let (x) = data
-                            let users = UserModel(uid: id, dict: x as! [String : Any])
-                            self.users.append(users)
-                        }
-                        
-                        //sort users
-                        self.users.sort { (u1, u2) -> Bool in
-                            return u1.username.compare(u2.username) == .orderedAscending
-                        }
-                        
-                        //assign same value
-                        self.filterUsers = self.users
+                    //sorting users
+                    self.users.sort { (u1, u2) -> Bool in
+                        return u1.username.compare(u2.username) == .orderedAscending
                     }
                     
+                    //assign value to new array
+                    self.filterUsers = self.users
 
                     //reload collection view
                     DispatchQueue.main.async {
@@ -173,6 +165,7 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         
         if (idUser == currentId) {
             print("Los id son iguales")
+            print(itemSelected)
         } else {
             print("Los id son diferentes")
             print(itemSelected)

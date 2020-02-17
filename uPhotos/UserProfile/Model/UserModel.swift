@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct UserModel:Codable {
+struct UserModel:Codable, Identifiable {
     
     let id:String
     let username:String
@@ -22,7 +22,6 @@ struct UserModel:Codable {
     
     //define the diccionary
     init(uid: String, dict:[String:Any]) {
-        
         self.id = uid
         self.username = dict["username"] as? String ?? ""
         self.first_name = dict["first_name"] as? String ?? ""
