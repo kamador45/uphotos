@@ -105,9 +105,21 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
                     
                     //running every value and key
                     json?.forEach({ (data) in
-                        let x = data
-                        guard let id = x["id"] as? String else {return}
-                        let listUsers = UserModel(uid: id, dict: x as! [String:Any])
+                        
+                        //gets data
+                        let key = data
+                        
+                        //capture id key
+                        guard let id = key["id"] as? String else {return}
+                        
+                        //compare current user in session
+                        if userData?.id == id {
+                            print("usuario en sesion encontrado ==>\(userData?.id ?? "")")
+                            return
+                        }
+                        
+                        //creating new dictionary
+                        let listUsers = UserModel(uid: id, dict: key as! [String : Any] )
                         print(listUsers)
                         self.users.append(listUsers)
                     })
@@ -164,11 +176,13 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         guard let currentId = userData?.id else {return}
         
         if (idUser == currentId) {
-            print("Los id son iguales")
+            print("Usuario en session ==.\(currentId)")
             print(itemSelected)
         } else {
             print("Los id son diferentes")
             print(itemSelected)
+            //Loading home controller of guest user
+            
         }
         
     }

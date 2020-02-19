@@ -16,7 +16,7 @@ var listUsers:SearchModel?
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
 //global address to server
-var serverURL = "http://192.168.1.166:1337/" //"http://192.168.0.11:1337/"
+var serverURL = "http://10.9.45.183:1337/"//"http://192.168.1.166:1337/"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
