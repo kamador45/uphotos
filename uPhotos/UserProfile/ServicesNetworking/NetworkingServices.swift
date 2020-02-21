@@ -38,8 +38,9 @@ class NetworkingServices {
                     guard let idUsr = json!["id"] as? String else {return}
 
                     if !(idUsr).isEmpty {
+                        
+                        //creating dictionary
                         let newDictionary = UserModel(uid: idUsr, dict: json as! [String : Any])
-
 
                         //encode objects receive from server
                         UserDefaults.standard.set(try? PropertyListEncoder().encode(newDictionary), forKey: "parseJSON")
@@ -51,7 +52,9 @@ class NetworkingServices {
                         guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
 
                         //Store all info in global var
-                        userData = userInfo
+                        DispatchQueue.main.async {
+                            userData = userInfo
+                        }
                     }
                     
                 } catch let errorJSON {

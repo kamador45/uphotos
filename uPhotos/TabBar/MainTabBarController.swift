@@ -18,6 +18,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         
         //Execute functions
         SetupController()
+
+        //execute animate function
+        AnimateBrand()
     }
     
     
@@ -104,6 +107,38 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             }
             
             return
+        }
+    }
+    
+    //creating animation to tab bar
+    func AnimateBrand() {
+        //red layer
+        let layer = UIView()
+        layer.frame = self.view.frame
+        layer.backgroundColor = .systemRed
+        self.view.addSubview(layer)
+        
+        //logotipo of app
+        let logo = UIImageView()
+        logo.image = UIImage(named: "mupics.png")
+        logo.frame.size.width = 100
+        logo.frame.size.height = 100
+        logo.center = view.center
+        self.view.addSubview(logo)
+        
+        //creating animation
+        UIView.animate(withDuration: 0.5, delay: 1, options: .curveLinear, animations: {
+            logo.transform = CGAffineTransform.init(scaleX: 0.9, y: 0.9)
+        }) { (finished:Bool) in
+            if finished {
+                UIView.animate(withDuration: 0.5) {
+                    logo.transform = CGAffineTransform.init(scaleX: 20, y: 20)
+                    UIView.animate(withDuration: 0.1, delay: 0.3, options: .curveLinear, animations: {
+                        logo.alpha = 0
+                        layer.alpha = 0
+                    }, completion: nil)
+                }
+            }
         }
     }
     

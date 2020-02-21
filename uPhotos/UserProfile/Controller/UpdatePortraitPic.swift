@@ -358,8 +358,8 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
             }
         }
         
+        //define filename
         let filename = "profile.jpg"
-        
         let mimetype = "image/jpg"
         
         body.appendStrings(string: "--\(boundary)\r\n")
@@ -371,7 +371,6 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
         body.appendStrings(string: "--\(boundary)--\r\n")
         
         return body
-        
     }
     
     //upload portrait picture
@@ -403,10 +402,8 @@ class UpdatePortraitPic: UIViewController, UIImagePickerControllerDelegate, UINa
                 return
             }
             
-            
             //define body request
             request.httpBody = self.createBodyWithParams(parameters: params, filePathKey: "file", imageDataKey: imageData! as NSData, boundary: boundary) as Data
-            
             
             //Start services of networking
             URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in

@@ -73,8 +73,6 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             navigationItem.largeTitleDisplayMode = .never
         }
         
-        print(userData)
-        
         //call functions
         DescargaNewInfoUsr()
         DownloadPostUsr()
@@ -100,18 +98,25 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     //manage fetch data
     @objc fileprivate func Fetch() {
-        ManageRefresh()
-        collectionView.reloadData()
+        DispatchQueue.main.async {
+            self.DescargaUsrInfo()
+            self.ManageRefresh()
+            self.collectionView.reloadData()
+        }
     }
     
     @objc fileprivate func ManageRefresh() {
-        DescargaNewInfoUsr()
-        collectionView.refreshControl = RefreshControl
-        RefreshControl.endRefreshing()
+        DispatchQueue.main.async {
+            self.DescargaNewInfoUsr()
+            self.collectionView.refreshControl = self.RefreshControl
+            self.RefreshControl.endRefreshing()
+        }
     }
     
     fileprivate func DescargaNewInfoUsr() {
-        DescargaUsrInfo()
+        DispatchQueue.main.async {
+            self.DescargaUsrInfo()
+        }
     }
     
     //Download info user
@@ -119,12 +124,15 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //get id on current session
          let uid = userId ?? (userData?.id ?? "")
+        
+         print(uid)
          
          //Execute the process in brackground
         NetworkingServices.DownloadMainInfoUsr(uid: uid) { (user) in
             DispatchQueue.main.async {
                //accede a la info del usuario
                self.InfoUser = user
+                print(user)
                let navBar = self.InfoUser?.username
                self.navigationItem.title = navBar
             }

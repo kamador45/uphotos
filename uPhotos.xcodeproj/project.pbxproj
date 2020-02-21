@@ -36,6 +36,7 @@
 		1FEE0EBA2311FB6300EE1E29 /* UserProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE0EB92311FB6300EE1E29 /* UserProfileController.swift */; };
 		1FEE0EBF2312041E00EE1E29 /* UserProfileHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE0EBE2312041E00EE1E29 /* UserProfileHeader.swift */; };
 		1FEE0EC4231206BC00EE1E29 /* user_avatar.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FEE0EC3231206BC00EE1E29 /* user_avatar.png */; };
+		1FEEB59123FEFED40012F388 /* mupics.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FEEB59023FEFED40012F388 /* mupics.png */; };
 		1FF0103E2310A1620072006D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF0103D2310A1620072006D /* AppDelegate.swift */; };
 		1FF010402310A1620072006D /* SignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF0103F2310A1620072006D /* SignInController.swift */; };
 		1FF010432310A1620072006D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1FF010412310A1620072006D /* Main.storyboard */; };
@@ -74,6 +75,7 @@
 		1FEE0EB92311FB6300EE1E29 /* UserProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileController.swift; sourceTree = "<group>"; usesTabs = 0; };
 		1FEE0EBE2312041E00EE1E29 /* UserProfileHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileHeader.swift; sourceTree = "<group>"; };
 		1FEE0EC3231206BC00EE1E29 /* user_avatar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user_avatar.png; sourceTree = "<group>"; };
+		1FEEB59023FEFED40012F388 /* mupics.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = mupics.png; path = ../../../../Desktop/mupics.png; sourceTree = "<group>"; };
 		1FF0103A2310A1620072006D /* uPhotos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uPhotos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF0103D2310A1620072006D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1FF0103F2310A1620072006D /* SignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInController.swift; sourceTree = "<group>"; };
@@ -335,6 +337,7 @@
 				1F5C340B23233CE500E2654A /* portrait.png */,
 				1FF010462310A1620072006D /* LaunchScreen.storyboard */,
 				1FF010492310A1620072006D /* Info.plist */,
+				1FEEB59023FEFED40012F388 /* mupics.png */,
 				1FEE0EC3231206BC00EE1E29 /* user_avatar.png */,
 			);
 			path = uPhotos;
@@ -440,6 +443,7 @@
 				1FF010432310A1620072006D /* Main.storyboard in Resources */,
 				1F5C340C23233CE600E2654A /* portrait.png in Resources */,
 				1FEE0EC4231206BC00EE1E29 /* user_avatar.png in Resources */,
+				1FEEB59123FEFED40012F388 /* mupics.png in Resources */,
 				1F54FF81231454E900678823 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

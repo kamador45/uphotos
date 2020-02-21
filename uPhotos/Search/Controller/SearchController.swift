@@ -181,8 +181,14 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         } else {
             print("Los id son diferentes")
             print(itemSelected)
-            //Loading home controller of guest user
             
+            DispatchQueue.main.async {
+                //Loading home controller of guest user
+                let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
+                userProfileController.userId = itemSelected.id
+                self.navigationController?.pushViewController(userProfileController, animated: true)
+                userProfileController.collectionView.reloadData()
+            }
         }
         
     }

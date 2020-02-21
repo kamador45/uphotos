@@ -56,7 +56,7 @@ class SearchUsrCell: UICollectionViewCell {
     let UsernameLbl: UILabel = {
         let lbl = UILabel()
         lbl.textAlignment = .center
-        lbl.textColor = .black
+        lbl.textColor = .systemGray
         lbl.font = UIFont.boldSystemFont(ofSize: 18)
         lbl.numberOfLines = 0
         lbl.translatesAutoresizingMaskIntoConstraints = false
@@ -94,7 +94,7 @@ class SearchUsrCell: UICollectionViewCell {
         
         //Line separator
         let separator = UIView()
-        separator.backgroundColor = UIColor(white: 0, alpha: 0.5)
+        separator.backgroundColor = .systemGray //UIColor(white: 0, alpha: 0.5)
         separator.translatesAutoresizingMaskIntoConstraints = false
         
         //Add to view
