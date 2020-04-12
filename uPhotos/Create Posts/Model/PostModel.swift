@@ -11,17 +11,20 @@ import Foundation
 struct PostModel:Codable {
     
     //define items diccionary
-    let uid:String
+    let id:String?
+    let id_user:String
     let caption: String
     let img_url: String
     let createAt: Date
     
     //define diccionary
-    init(uid: String, diccPost:[String:Any]) {
-        self.uid = uid
-        self.caption = diccPost["caption"] as? String ?? ""
-        self.img_url = diccPost["img_path"] as? String ?? ""
-        let secondsFrom1970 = diccPost["createAt"] as? Double ?? 0
+    init(uid: String ,dictPost:[String:Any]) {
+        //gets value from dictionary
+        self.id_user = uid
+        self.id = dictPost["id"] as? String ?? ""
+        self.img_url = dictPost["img_path"] as? String ?? ""
+        self.caption = dictPost["caption"] as? String ?? ""
+        let secondsFrom1970 = dictPost["createdAt"] as? Double ?? 0
         self.createAt = Date(timeIntervalSince1970: secondsFrom1970)
     }
 }

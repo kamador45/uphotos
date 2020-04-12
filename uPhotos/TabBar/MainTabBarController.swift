@@ -46,10 +46,20 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     //Setup Controller and detect the session
     func SetupController() {
         
+        //getting id user from session
         let id = userData?.id
         
         //Detect if user it is log in !(userInfo.id).isEmpty
         if id != nil {
+            
+            DispatchQueue.main.async {
+                //gets username in session
+                let username = currentUser!["username"] as! String
+                //message
+                let message = "Welcome" +  " " + username
+                //show welcome message
+                InfoViewEvent.ShowingMessage(message: message, color: .systemGreen)
+            }
             
             //Home Controller
             let homeNavController = self.TemplateControllers(unselected: #imageLiteral(resourceName: "home_unselected.png"), selected: #imageLiteral(resourceName: "home_selected.png"), rootViewController: HomeFeedController(collectionViewLayout: UICollectionViewFlowLayout()))
@@ -94,6 +104,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             //set icons
             guard let items = self.tabBar.items else { return }
             
+            //run every items
             for item in items {
                 item.imageInsets = UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0)
             }
@@ -112,6 +123,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     //creating animation to tab bar
     func AnimateBrand() {
+        
         //red layer
         let layer = UIView()
         layer.frame = self.view.frame
@@ -127,7 +139,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         self.view.addSubview(logo)
         
         //creating animation
-        UIView.animate(withDuration: 0.5, delay: 1, options: .curveLinear, animations: {
+        UIView.animate(withDuration: 0.5, delay: 2, options: .curveLinear, animations: {
             logo.transform = CGAffineTransform.init(scaleX: 0.9, y: 0.9)
         }) { (finished:Bool) in
             if finished {

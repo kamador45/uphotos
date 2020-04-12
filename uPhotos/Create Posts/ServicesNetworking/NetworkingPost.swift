@@ -82,58 +82,6 @@ class NetworkingPost {
         }.resume()
     }
     
-    //Download all post made by user.
-    static func DownloadPostByUsr(uid:String, completion:@escaping(PostModel) -> ()) {
-        
-        //define url
-        guard let url = URL(string: "\(serverURL)find_posts/\(uid)") else {return}
-        
-        print("estoy enviando esta url ==>\(url)")
-        
-        //Network request
-        NetworkingPost.getPosts(from: url as URL) { (data, response, error) in
-            
-            //Detect any error
-            if let err = error {
-                print("Oops something has been bad ==>\(err)")
-            } else {
-                
-                do {
-                    
-                    //get data
-                    guard let data = data else {return}
-                    
-                    //serialization data
-                    guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary else {return}
-                    
-                    //define key of objects
-                    let results = json.value(forKey: "results") as! [AnyObject]
-                    
-                    
-                    //detect if exist data
-                    if !(results).isEmpty {
-                        
-                        //Loop to objects send from server
-                        for x in results {
-                            
-                            //receive objects
-                            let objetos = x["PostDetails"]
-                            
-                            //send to model
-                            let newDicc = PostModel(uid: uid, diccPost: objetos as! [String : Any])
-                            
-                            //Assign to global var
-                            postDataUsr = newDicc
-                        }
-                    }
-                    
-                } catch let errorJSON {
-                    print("Oops something in JSON convert has been bad ==>\(errorJSON)")
-                }
-            }
-        }
-    }
-    
     // custom body of HTTP request to upload image file
     static func createBodyWithParams(parameters: [String: Any]?, filePathKey: String?, imageDataKey: NSData, boundary: String) -> NSData {
         

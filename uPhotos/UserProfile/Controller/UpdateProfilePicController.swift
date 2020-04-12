@@ -220,61 +220,72 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         ])
     }
     
+    //Load info user
     func DownloadInfoUser() {
         
-        //capture id user on session
-        guard let userId = userData?.id else {return}
+        //get current id in session
+        guard let userId = currentUser!["id"] as? String else {return}
         
         //define the url
         guard let url = URL(string: "\(serverURL)find/\(userId)") else {return}
         
+        //networking process
         NetworkingServices.getData(from: url) { (data, response, error) in
-            guard let data = data else {return}
-            
+            //detect any error
             if let err = error {
-                print("Oops something go wrong==>\(err)")
+                print("Oops something has been result bad ==>\(err)")
+                return
             } else {
                 do {
-                    //receive data send from server
-                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
+                    //gets data
+                    guard let data = data else {return}
                     
-                    //access to id
-                    guard let id = json!["id"] as? String else {return}
+                    //serialization process
+                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
                     
-                    //adapt all object to model
-                    let parseJSON = UserModel(uid: id, dict: json as! [String : Any])
-                    
-                    //compare id
-                    if !(id).isEmpty {
-                        DispatchQueue.main.async {
-                            self.UsernameLbl.text = parseJSON.username
-                            self.FirstnameLbl.text = parseJSON.first_name
-                            self.LastnameLbl.text = parseJSON.last_name
-                            self.BioTextView.text = parseJSON.bio
+                    //loop every object
+                    json?.forEach({ (data) in
+                        //store data
+                        let data_received = data
+                        
+                        //gets id user
+                        guard let id = data_received["id"] as? String else {return}
+                        
+                        //compare current id with id send it from server
+                        if userId == id {
+                            //insert objects in model
+                            let parseJSON = UserModel(uid: id, dict: data_received as! [String:Any])
+                            
+                            //create url profile pic
+                            let url_pp = parseJSON.path_pic
+                            let urls = NSURL(string: url_pp)!
+                            
+                            //convert url to data
+                            let data_pp = try? Data(contentsOf: urls as URL)
+                            
+                            //check if exist any data and load profile pic
+                            if data_pp != nil {
+                                DispatchQueue.main.async {
+                                    self.Avatar.image = UIImage(data: data_pp!)
+                                    self.UsernameLbl.text = parseJSON.username
+                                    self.FirstnameLbl.text = parseJSON.first_name
+                                    self.LastnameLbl.text = parseJSON.last_name
+                                    self.BioTextView.text = parseJSON.bio
+                                }
+                            } else {
+                                DispatchQueue.main.async {
+                                    let img = UIImage(named: "user_avatar.png")
+                                    self.Avatar.image = img
+                                }
+                            }
                         }
-                    }
-                    
-                    guard let urlProfilePic = self.userInfo?.path_pic else {return}
-                    let urls = NSURL(string: urlProfilePic)!
-                    let datas = try? Data(contentsOf: urls as URL)
-                   
-                    //check if exist some data
-                    if datas != nil {
-                        DispatchQueue.main.async {
-                            self.Avatar.image = UIImage(data: datas!)
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            let img = UIImage(named: "user_avatar.png")
-                            self.Avatar.image = img
-                        }
-                    }
+                    })
                     
                 } catch let errorJSON {
-                    print("Oops something go wrong==>\(errorJSON)")
+                    print("Oops something has been result bad in errorJSON ==>\(errorJSON)")
+                    return
                 }
             }
-            
         }
     }
     

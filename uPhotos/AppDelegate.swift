@@ -12,8 +12,12 @@ import UIKit
 var userData:UserModel?
 var postDataUsr:PostModel?
 var listUsers:SearchModel?
-
+var currentUser: NSDictionary?
+var guestUser: NSDictionary?
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
+var infoViewShowing = false
+var filterUsers = [UserModel]()
+var users = [UserModel]()
 
 //global address to server
 var serverURL = "http://192.168.1.166:1337/"
@@ -25,23 +29,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-
-        //load data content send from server
-        guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else { return true }
-        guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return true}
-
-        //store data
-        userData = userInfo
         
-        //detect if exist session
-        if userData != nil {
-            let id = userData!.id
-            if !(id).isEmpty {
+        //load data content send from server
+        currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
+        
+        if currentUser != nil {
+            let id = currentUser!["id"] as? String
+            userData = UserModel(uid: id!, dict: currentUser as! [String : Any])
+            if id != nil {
                 Login()
             }
         }
         
+        //return value
         return true
     }
     

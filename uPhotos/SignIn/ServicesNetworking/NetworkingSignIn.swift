@@ -23,7 +23,8 @@ class NetworkingSignIn {
         
         //Check if exist any data
         if username.isEmpty || password.isEmpty {
-            print("Los campos estan vacios")
+            let message = "Oops all fields are require"
+            InfoViewEvent.ShowingMessage(message: message, color: .systemRed)
         } else {
             
             //create request
@@ -58,29 +59,29 @@ class NetworkingSignIn {
                         }
                         
                         //Access to object to data
-                        let id = parseJSON["id"]
+                        let id = parseJSON["id"] as? String
                         
                         //detect if exist some data
                         if id != nil {
-                            print("I found this info ==>\(id)")
                             
-                            let newDic = UserModel(uid: id as! String, dict: parseJSON as! [String : Any])
+                            print("I found this info ==>\(id ?? "")")
                             
-                            //Update info store in device
-                            UserDefaults.standard.set(try? PropertyListEncoder().encode(newDic), forKey: "parseJSON")
+                            //store value
+                            UserDefaults.standard.set(parseJSON, forKey: "parseJSON")
+                            currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
                             
-                            //convert all data in object
-                            guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
+                            //test
+                            userData = UserModel(uid: id!, dict: currentUser as! [String : Any])
                             
-                            //insert and decode all object in model
-                            guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                            
-                            //Store new info
-                            userData = userInfo
-                            
-                            //create session
+                            //load home screen
                             DispatchQueue.main.async {
                                 appDelegates.Login()
+                            }
+                        } else {
+                            DispatchQueue.main.async {
+                                let message = parseJSON["err"] as! String
+                                print(message)
+                                InfoViewEvent.ShowingMessage(message: message, color: .systemRed)
                             }
                         }
                     } catch let errorJSON {

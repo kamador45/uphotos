@@ -101,10 +101,7 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         navigationController?.pushViewController(controller, animated: true)
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
+    //detect tap and hide keyword
     @objc fileprivate func HideKeyword() {
         self.view.endEditing(true)
         print("tap detected")

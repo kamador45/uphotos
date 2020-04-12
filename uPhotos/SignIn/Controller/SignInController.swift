@@ -102,7 +102,7 @@ class SignInController: UIViewController, UITextFieldDelegate {
     
     //change status bar
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return .default
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

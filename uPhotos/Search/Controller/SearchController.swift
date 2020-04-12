@@ -77,75 +77,121 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         }
     }
     
-    
-    //Arrays to users
-    var filterUsers = [UserModel]()
-    var users = [UserModel]()
-    
-    //Gets all user
+    //load all users
     fileprivate func ListAllUsers() {
-        
+
         //define url
         guard let url = URL(string: "\(serverURL)list_users/") else {return}
-        
-        //network process
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            
-            //detect any error
+
+        //call networking services
+        NetworkingSearch.getData(from: url) { (data, response, error) in
             if let err = error {
-                print("Oops something has been result bad ==>\(err)")
+                print("Opps something has been result bad ==>\(err)")
             } else {
-                
                 do {
-                    //data
+                    //ensure get data value
                     guard let data = data else {return}
-                
+                    
                     //cast to json
                     let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
                     
-                    //running every value and key
+                    //run every element
                     json?.forEach({ (data) in
                         
-                        //gets data
+                        //get key of data
                         let key = data
                         
                         //capture id key
                         guard let id = key["id"] as? String else {return}
                         
-                        //compare current user in session
+                        //compare between id users
                         if userData?.id == id {
-                            print("usuario en sesion encontrado ==>\(userData?.id ?? "")")
+                            print("Current user has been found ==>\(userData?.id ?? "")")
                             return
                         }
                         
-                        //creating new dictionary
-                        let listUsers = UserModel(uid: id, dict: key as! [String : Any] )
-                        print(listUsers)
-                        self.users.append(listUsers)
+                        //create new dictionary
+                        let listUsers = UserModel(uid: id, dict: key as! [String:Any])
+                        users.append(listUsers)
                     })
                     
-                    print(self.users)
-                    
                     //sorting users
-                    self.users.sort { (u1, u2) -> Bool in
+                    users.sort { (u1, u2) -> Bool in
                         return u1.username.compare(u2.username) == .orderedAscending
                     }
                     
                     //assign value to new array
-                    self.filterUsers = self.users
-
-                    //reload collection view
+                    filterUsers = users
+                    
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
                     }
                     
                 } catch let errorJSON {
-                    print("Oops something has been result bad with JSON ==>\(errorJSON)")
+                    print("Oops something has been result bad ==>\(errorJSON)")
                 }
             }
+        }
         
-            
-        }.resume()
+        //load networking services
+//        DispatchQueue.main.async {
+//            self.collectionView.reloadData()
+//        }
+
+        //network process
+//        URLSession.shared.dataTask(with: url) { (data, response, error) in
+//
+//            //detect any error
+//            if let err = error {
+//                print("Oops something has been result bad ==>\(err)")
+//            } else {
+//
+//                do {
+//                    //data
+//                    guard let data = data else {return}
+//
+//                    //cast to json
+//                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+//
+//                    //running every value and key
+//                    json?.forEach({ (data) in
+//
+//                        //gets data
+//                        let key = data
+//
+//                        //capture id key
+//                        guard let id = key["id"] as? String else {return}
+//
+//                        //compare current user in session
+//                        if userData?.id == id {
+//                            print("usuario en sesion encontrado ==>\(userData?.id ?? "")")
+//                            return
+//                        }
+//
+//                        //creating new dictionary
+//                        let listUsers = UserModel(uid: id, dict: key as! [String : Any] )
+//                        self.users.append(listUsers)
+//                    })
+//
+//                    //sorting users
+//                    self.users.sort { (u1, u2) -> Bool in
+//                        return u1.username.compare(u2.username) == .orderedAscending
+//                    }
+//
+//                    //assign value to new array
+//                    self.filterUsers = self.users
+//
+//                    //reload collection view
+//                    DispatchQueue.main.async {
+//                        self.collectionView.reloadData()
+//                    }
+//
+//                } catch let errorJSON {
+//                    print("Oops something has been result bad with JSON ==>\(errorJSON)")
+//                }
+//            }
+//
+//        }.resume()
     }
     
     //settings collectionview cell
@@ -159,6 +205,7 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         //Access to cell
         let celda = collectionView.dequeueReusableCell(withReuseIdentifier: celda_id, for: indexPath) as! SearchUsrCell
         
+        //showing list users
         celda.usersList = filterUsers[indexPath.item]
         
         //return cell
@@ -170,26 +217,11 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         
         //Access to item position
         let itemSelected = filterUsers[indexPath.item]
-        print(itemSelected.id)
         
-        let idUser = itemSelected.id
-        guard let currentId = userData?.id else {return}
-        
-        if (idUser == currentId) {
-            print("Usuario en session ==.\(currentId)")
-            print(itemSelected)
-        } else {
-            print("Los id son diferentes")
-            print(itemSelected)
-            
-            DispatchQueue.main.async {
-                //Loading home controller of guest user
-                let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
-                userProfileController.userId = itemSelected.id
-                self.navigationController?.pushViewController(userProfileController, animated: true)
-                userProfileController.collectionView.reloadData()
-            }
-        }
+        //init controller
+        let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
+        userProfileController.userId = itemSelected.id
+        navigationController?.pushViewController(userProfileController, animated: true)
         
     }
     
@@ -220,12 +252,14 @@ extension SearchController: UISearchResultsUpdating {
         //Detect if exist any data
         if text.isEmpty {
             filterUsers = users
+            print(filterUsers)
         } else {
-            filterUsers = self.users.filter({ (user) -> Bool in
+            filterUsers = users.filter({ (user) -> Bool in
                 return user.username.lowercased().contains(text.lowercased())
             })
         }
         
+        //reload collection view
         self.collectionView.reloadData()
     }
 }

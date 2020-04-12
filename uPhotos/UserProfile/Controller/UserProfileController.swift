@@ -11,14 +11,9 @@ import UIKit
 
 class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    //define property to menu view
     var menuView = MenuView()
     let height:CGFloat = 325
-    
-    //Access to model user
-    var InfoUser: UserModel?
-    
-    //Access to model post
-    var PostUsr: PostModel?
     
     //receive id user
     var userId:String?
@@ -39,13 +34,23 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         taps.numberOfTouchesRequired = 1
         self.collectionView.addGestureRecognizer(taps)
         
+        //Add background color in dependecy of enviroment
+        if #available(iOS 12, *) {
+            if self.traitCollection.userInterfaceStyle == .light {
+                print("light enviroment has been detected")
+                self.collectionView.backgroundColor = .white
+            } else {
+                print("Dark enviroment has been detected")
+                self.collectionView.backgroundColor = .black
+            }
+        }
+        
         
         //Call notification
          NotificationCenter.default.addObserver(self, selector: #selector(Fetch), name: UpdateProfilePicController.ProfilePicture, object: "parseJSON")
 
         //reload collectionview
         RefreshControl.addTarget(self, action: #selector(ManageRefresh), for: .valueChanged)
-        Fetch()
 
         if #available(iOS 10, *) {
             collectionView.refreshControl = RefreshControl
@@ -74,7 +79,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         }
         
         //call functions
-        DescargaNewInfoUsr()
+        DescargaUsrInfo()
         DownloadPostUsr()
         ManageActionsControllers()
     }
@@ -99,7 +104,6 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     //manage fetch data
     @objc fileprivate func Fetch() {
         DispatchQueue.main.async {
-            self.DescargaUsrInfo()
             self.ManageRefresh()
             self.collectionView.reloadData()
         }
@@ -107,37 +111,11 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     @objc fileprivate func ManageRefresh() {
         DispatchQueue.main.async {
-            self.DescargaNewInfoUsr()
+            self.DescargaUsrInfo()
             self.collectionView.refreshControl = self.RefreshControl
             self.RefreshControl.endRefreshing()
         }
     }
-    
-    fileprivate func DescargaNewInfoUsr() {
-        DispatchQueue.main.async {
-            self.DescargaUsrInfo()
-        }
-    }
-    
-    //Download info user
-    fileprivate func DescargaUsrInfo() {
-        
-        //get id on current session
-         let uid = userId ?? (userData?.id ?? "")
-        
-         print(uid)
-         
-         //Execute the process in brackground
-        NetworkingServices.DownloadMainInfoUsr(uid: uid) { (user) in
-            DispatchQueue.main.async {
-               //accede a la info del usuario
-               self.InfoUser = user
-                print(user)
-               let navBar = self.InfoUser?.username
-               self.navigationItem.title = navBar
-            }
-        }
-     }
     
     //Header settings
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -159,14 +137,44 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
            }
         }
         
-        //updating info
-        self.InfoUser = userData
-        
         //pass data to header view
-        header.userInfoProfile = InfoUser
+        header.userInfoProfile = self.usersModel
         
         return header
     }
+    
+    //Access to user model
+    var usersModel: UserModel?
+    
+    //Download info user
+    fileprivate func DescargaUsrInfo() {
+        
+        //get id on current session
+         let uid = userId ?? (currentUser!["id"])
+        
+        //download info of user
+        DispatchQueue.main.async {
+            NetworkingServices.DownloadMainInfoUsr(uid: uid as! String) { (user) in
+                
+                //access to user model
+                self.usersModel = user
+
+                //create full name
+                let full_name = (self.usersModel?.first_name)! + " " + (self.usersModel?.last_name)!
+
+                //creating fullname in navigation bar
+                DispatchQueue.main.async {
+                    self.navigationItem.title = full_name
+                }
+                
+                //reload collection view
+                self.collectionView.reloadData()
+            }
+        }
+        
+        //reload interface
+        collectionView.reloadData()
+     }
     
     //define number of cells
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -194,78 +202,59 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //re use the post pic cell
         let celda = collectionView.dequeueReusableCell(withReuseIdentifier: celdaId, for: indexPath) as! ProfilePostUsrCell
         
+        //pass data to header view
         celda.PostData = PostByUsr[indexPath.item]
         
+        //return UI
         return celda
     }
     
-    
+    //create array post
     var PostByUsr = [PostModel]()
 
     //Download post created by user
     fileprivate func DownloadPostUsr() {
-
-        //Access to id
-        let uid = userId ?? (userData?.id ?? "")
-        print("encontre esto ==>\(uid)")
         
+        //get id on current session
+        guard let uid = userId ?? currentUser!["id"] as? String else {return}
+        
+        //define url
         guard let url = URL(string: "\(serverURL)find_posts/\(uid)") else {return}
+        print(url)
         
-        NetworkingPost.getPosts(from: url) { (data, response, error) in
-            //Detect any error
-                if let err = error {
-                    print("Oops something has been bad ==>\(err)")
-                } else {
-                    
-                    do {
-                        
-                        //get data
-                        guard let data = data else {return}
-                        
-                        //serialization data
-                        guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary else {return}
-                        
-                        //define key of objects
-                        let results = json.value(forKey: "results") as! [AnyObject]
-                        
-                        
-                        //detect if exist data
-                        if !(results).isEmpty {
-                            
-                            //Loop to objects send from server
-                            for x in results {
-                                
-                                //receive objects
-                                let objetos = x["PostDetails"]
-                                
-                                //send to model
-                                let newDicc = PostModel(uid: uid, diccPost: objetos as! [String : Any])
-                                
-                                //Assign to global var
-                                postDataUsr = newDicc
-                                
-                                self.PostByUsr.insert(postDataUsr!, at: 0)
+        //define process to download post
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            do {
+                //ensure data
+                guard let data = data else {return}
 
-                                
-                                self.PostByUsr.sort { (p1, p2) -> Bool in
-                                    return p1.createAt.compare(p2.createAt) == .orderedDescending
-                                }
-                                
-                                print(self.PostByUsr)
-                                
-                                //print("Nuevo diccionario ===>\(newDicc)")
-                            }
-                            
-                            DispatchQueue.main.async {
-                                self.collectionView.reloadData()
-                            }
-                        }
-                        
-                    } catch let errorJSON {
-                        print("Oops something in JSON convert has been bad ==>\(errorJSON)")
+                //cast to json
+                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+
+                //run every element
+                json?.forEach({ (data) in
+                    
+                    //gets data
+                    let key = data
+                    
+                    //gets key of every post
+                    guard let details = key["details"] else {return}
+                    
+                    //Insert every element in post model
+                    let post = PostModel(uid: uid, dictPost: details as! [String : Any])
+                    
+                    //Insert element in array
+                    self.PostByUsr.append(post)
+                })
+
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
                 }
+
+            } catch let errorJSON {
+                print("Oops something has been result bad ==>\(errorJSON)")
             }
-        }
+        }.resume()
     }
     
     //define size header

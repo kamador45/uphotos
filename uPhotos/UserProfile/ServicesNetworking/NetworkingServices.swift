@@ -24,42 +24,56 @@ class NetworkingServices {
         //Define the url
         guard let url = URL(string: "\(serverURL)find/\(uid)") else {return}
         
-        //process to network
-        NetworkingServices.getData(from: url) { (data, response, error) in
-            if let err = error {
-                print("Ocurrio un error con el nuevo metodo de descarga ==\(err)")
-            } else {
-                do {
-                    
-                    guard let data = data else {return}
-                    
-                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary
-                    
-                    guard let idUsr = json!["id"] as? String else {return}
-
-                    if !(idUsr).isEmpty {
-                        
-                        //creating dictionary
-                        let newDictionary = UserModel(uid: idUsr, dict: json as! [String : Any])
-
-                        //encode objects receive from server
-                        UserDefaults.standard.set(try? PropertyListEncoder().encode(newDictionary), forKey: "parseJSON")
-
-                        //convert data to object
-                        guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-
-                        //decode and insert all data in model
-                        guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-
-                        //Store all info in global var
-                        DispatchQueue.main.async {
-                            userData = userInfo
-                        }
+        if Reachability.isConnectedToNetwork() {
+            print("Internet detected")
+            //process to network
+            NetworkingServices.getData(from: url) { (data, response, error) in
+                if let err = error {
+                    print("Ocurrio un error con el nuevo metodo de descarga ==\(err)")
+                    DispatchQueue.main.async {
+                        let controller = BlockScreenController()
+                        controller.modalPresentationStyle = .overFullScreen
+                        UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
                     }
+                } else {
                     
-                } catch let errorJSON {
-                    print("Ocurrio un error al atrapar los datos ==>\(errorJSON)")
+                    do {
+                        //getting data
+                        guard let data = data else {return}
+                        
+                        //serialization of data
+                        let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+                        
+                        DispatchQueue.main.async {
+                            //getting every object from data
+                            json?.forEach({ (data) in
+
+                                //store key
+                                let key = data
+
+                                //get id key
+                                guard let id = key["id"] as? String else {return}
+                                
+                                //creating new dictionary
+                                let userData = UserModel(uid: id, dict: key as! [String:Any])
+                                
+                                //assign value
+                                completion(userData)
+
+                            })
+                        }
+                        
+                    } catch let errorJSON {
+                        print("Ocurrio un error al atrapar los datos ==>\(errorJSON)")
+                    }
                 }
+            }
+        } else {
+            print("Internet not detected")
+            DispatchQueue.main.async {
+                let controller = BlockScreenController()
+                controller.modalPresentationStyle = .overFullScreen
+                UIApplication.shared.keyWindow?.rootViewController?.present(controller, animated: true, completion: nil)
             }
         }
     }

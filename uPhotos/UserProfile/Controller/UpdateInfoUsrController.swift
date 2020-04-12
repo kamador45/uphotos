@@ -141,7 +141,7 @@ class UpdateInfoUsrController: UIViewController, UITextFieldDelegate, UITextView
     //settings navbar
     func SettingNavBar() -> Void {
         
-        let navItem = UINavigationItem(title: "Info")
+        let navItem = UINavigationItem(title: "Edit Info")
         navItem.rightBarButtonItem = SaveBtn
         let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(CancelEdit))
         navItem.leftBarButtonItem = cancelBtn

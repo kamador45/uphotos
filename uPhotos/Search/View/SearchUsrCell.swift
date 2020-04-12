@@ -88,7 +88,7 @@ class SearchUsrCell: UICollectionViewCell {
         ])
         
         NSLayoutConstraint.activate([
-            UsernameLbl.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            UsernameLbl.centerYAnchor.constraint(equalTo: Avatar.centerYAnchor),
             UsernameLbl.leftAnchor.constraint(equalTo: Avatar.rightAnchor, constant: 8)
         ])
         

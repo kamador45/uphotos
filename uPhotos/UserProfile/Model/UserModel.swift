@@ -14,11 +14,9 @@ struct UserModel:Codable, Identifiable {
     let username:String
     let first_name:String
     let last_name:String
-    let fullname:String
     let path_pic:String
     let path_portrait:String
     let bio:String
-    let status:String
     
     //define the diccionary
     init(uid: String, dict:[String:Any]) {
@@ -26,10 +24,8 @@ struct UserModel:Codable, Identifiable {
         self.username = dict["username"] as? String ?? ""
         self.first_name = dict["first_name"] as? String ?? ""
         self.last_name = dict["last_name"] as? String ?? ""
-        self.fullname = "\(dict["first_name"] as? String ?? "")" + " " + "\(dict["last_name"] as? String ?? "")"
         self.path_pic = dict["path_pic"] as? String ?? ""
         self.path_portrait = dict["path_portrait"] as? String ?? ""
         self.bio = dict["bio"] as? String ?? ""
-        self.status = dict["status"] as? String ?? ""
     }
 }

@@ -11,6 +11,63 @@ import UIKit
 
 class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     
+    //define guest user id
+    var guestId:String?
+    
+    //Show data in view
+    var userInfoProfile: UserModel? {
+        didSet {
+            DispatchQueue.main.async {
+                
+                //download and set profile pic
+                guard let urlProfile = self.userInfoProfile?.path_pic else {return}
+                let urls = NSURL(string: urlProfile)!
+                let datas = try? Data(contentsOf: urls as URL)
+            
+                //check if exist any data
+                if datas != nil {
+                    DispatchQueue.main.async {
+                        self.Avatar.image = UIImage(data: datas!)
+                    }
+                } else {
+                    let img = UIImage(named: "user_avatar.png")
+                    self.Avatar.image = img
+                }
+                
+                //download and set portrait pic
+                guard let urlPortrait = self.userInfoProfile?.path_portrait else {return}
+                let urls_portraits = NSURL(string: urlPortrait)!
+                let data_portrait = try? Data(contentsOf: urls_portraits as URL)
+                
+                //check if exist some data
+                if data_portrait != nil {
+                    DispatchQueue.main.async {
+                        self.Portrait.image = UIImage(data: data_portrait!)
+                    }
+                } else {
+                    let img = UIImage(named: "portrait.png")
+                    self.Portrait.image = img
+                }
+                
+                //safe statement
+                let fullname = self.userInfoProfile!.first_name + " " + self.userInfoProfile!.last_name
+                guard let username = self.userInfoProfile?.username else {return}
+                guard let bio = self.userInfoProfile?.bio else {return}
+
+                //Show info send from server
+                self.FullnameLbl.text = fullname
+                self.UsernameLbl.text = username
+                self.BioLbl.text = bio
+                
+                //get value of id
+                self.guestId = self.userInfoProfile?.id
+            }
+            
+            //call function
+            CheckFollowBtn()
+        }
+    }
+    
     //portrait photo
     let Portrait: UIImageView = {
         let imv = UIImageView()
@@ -164,58 +221,10 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     //first function on load
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         //execute functions
         SetObjects()
         SettingsStadisticUsr()
         SettingsToolBar()
-    }
-
-    var userInfoProfile: UserModel? {
-        didSet {
-            DispatchQueue.main.async {
-                
-                //download and set profile pic
-                guard let urlProfile = self.userInfoProfile?.path_pic else {return}
-                let urls = NSURL(string: urlProfile)!
-                let datas = try? Data(contentsOf: urls as URL)
-            
-                //check if exist any data
-                if datas != nil {
-                    DispatchQueue.main.async {
-                        self.Avatar.image = UIImage(data: datas!)
-                    }
-                } else {
-                    let img = UIImage(named: "user_avatar.png")
-                    self.Avatar.image = img
-                }
-                
-                //download and set portrait pic
-                guard let urlPortrait = self.userInfoProfile?.path_portrait else {return}
-                let urls_portraits = NSURL(string: urlPortrait)!
-                let data_portrait = try? Data(contentsOf: urls_portraits as URL)
-                
-                //check if exist some data
-                if data_portrait != nil {
-                    DispatchQueue.main.async {
-                        self.Portrait.image = UIImage(data: data_portrait!)
-                    }
-                } else {
-                    let img = UIImage(named: "portrait.png")
-                    self.Portrait.image = img
-                }
-                
-                //safe statement
-                guard let fullname = self.userInfoProfile?.fullname else {return}
-                guard let username = self.userInfoProfile?.username else {return}
-                guard let bio = self.userInfoProfile?.bio else {return}
-
-                //Show info send from server
-                self.FullnameLbl.text = fullname
-                self.UsernameLbl.text = username
-                self.BioLbl.text = bio
-            }
-        }
     }
 
     //Settings portrait
@@ -427,6 +436,8 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         CollectionPicLbl.textColor = UIColor.black
         GridBtn.tintColor = UIColor.black
         ListBtn.tintColor = UIColor.black
+        FollowUsr.tintColor = UIColor.black
+        FollowUsr.layer.borderColor = UIColor.black.cgColor
     }
     
     //this function try to adapt interface
@@ -442,6 +453,30 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
         CollectionPicLbl.textColor = .systemPink
         GridBtn.tintColor = .systemPink
         ListBtn.tintColor = .systemPink
+        FollowUsr.tintColor = .systemPink
+        FollowUsr.layer.borderColor = UIColor.systemPink.cgColor
+    }
+    
+    //check follow button
+    func CheckFollowBtn() {
+        
+        DispatchQueue.main.async {
+            
+            //get guest id user
+            let controller = UserProfileController()
+            controller.userId = self.guestId
+            
+            //get current id user in session
+            let currentIdUsr = currentUser!["id"] as? String
+            
+            //compare if both id are same or not
+            if self.guestId == currentIdUsr {
+                //hide follow option
+                self.FollowUsr.isHidden = true
+            } else {
+                self.FollowUsr.isHidden = false
+            }
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {

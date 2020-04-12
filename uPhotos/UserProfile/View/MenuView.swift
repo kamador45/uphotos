@@ -387,7 +387,8 @@ class MenuView: UIView {
     
     //Pass info to card
     fileprivate func LoadMenu() {
-        MsgLabel.text = "Hey \(userData?.username ?? "")!"
+        let username = currentUser!["username"] as? String
+        MsgLabel.text = "Hey \(username ?? "")!"
     }
     
     //set round corners
