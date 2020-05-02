@@ -246,6 +246,9 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
                     //Insert element in array
                     self.PostByUsr.append(post)
                 })
+                
+                //sorting post array
+                self.PostByUsr.reverse()
 
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
