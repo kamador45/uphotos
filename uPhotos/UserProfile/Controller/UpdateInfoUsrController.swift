@@ -262,12 +262,75 @@ class UpdateInfoUsrController: UIViewController, UITextFieldDelegate, UITextView
     
     //load main info
     fileprivate func PrepareMainInfo() {
-        DispatchQueue.main.async {
-            self.UsernameTxt.text = userData?.username
-            self.FirstnameTxt.text = userData?.first_name
-            self.LastnameTxt.text = userData?.last_name
-            self.BioTextView.text = userData?.bio
-        }
+       //get current id in session
+              guard let userId = currentUser!["id"] as? String else {return}
+              
+              print(userId)
+              
+              //define the url
+              guard let url = URL(string: "\(serverURL)find/\(userId)") else {return}
+              
+              //networking process
+              NetworkingServices.getData(from: url) { (data, response, error) in
+                  //detect any error
+                  if let err = error {
+                      print("Oops something has been result bad ==>\(err)")
+                      return
+                  } else {
+                      do {
+                          //gets data
+                          guard let data = data else {return}
+                          
+                          //serialization process
+                          let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+                          
+                          //loop every object
+                          json?.forEach({ (data) in
+                              //store data
+                              let data_received = data
+                              
+                              //gets id user
+                              guard let id = data_received["id"] as? String else {return}
+                              
+                              //compare current id with id send it from server
+                              if userId == id {
+                                  //insert objects in model
+                                  let parseJSON = UserModel(uid: id, dict: data_received as! [String:Any])
+                                  
+                                  print(parseJSON)
+                                  
+                                  //create url profile pic
+                                  let url_pp = parseJSON.path_pic
+                                  let urls = NSURL(string: url_pp)!
+                                  
+                                  //convert url to data
+                                  let data_pp = try? Data(contentsOf: urls as URL)
+                                  
+                                  //check if exist any data and load profile pic
+                                  if data_pp != nil {
+                                      DispatchQueue.main.async {
+                                        self.UsernameTxt.text = parseJSON.username
+                                        self.FirstnameTxt.text = parseJSON.first_name
+                                        self.LastnameTxt.text = parseJSON.last_name
+                                        self.BioTextView.text = parseJSON.bio
+                                      }
+                                  } else {
+                                      DispatchQueue.main.async {
+                                          self.UsernameTxt.text = parseJSON.username
+                                          self.FirstnameTxt.text = parseJSON.first_name
+                                          self.LastnameTxt.text = parseJSON.last_name
+                                          self.BioTextView.text = parseJSON.bio
+                                      }
+                                  }
+                              }
+                          })
+                          
+                      } catch let errorJSON {
+                          print("Oops something has been result bad in errorJSON ==>\(errorJSON)")
+                          return
+                      }
+                  }
+              }
     }
     
     //cancel update

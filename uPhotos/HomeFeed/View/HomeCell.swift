@@ -12,8 +12,7 @@ import UIKit
 class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
     //user avatar
     let Avatar: UIImageView = {
-        let img = UIImage(named: "user_avatar.png")
-        let ava = UIImageView(image: img)
+        let ava = UIImageView()
         ava.contentMode = .scaleAspectFill
         ava.layer.cornerRadius = 7
         ava.layer.borderWidth = 1
@@ -103,7 +102,6 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
         tv.font = UIFont.boldSystemFont(ofSize: 17)
         tv.textAlignment = .justified
         tv.textColor = .black
-        tv.text = "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system."
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
@@ -120,11 +118,44 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
         return vw
     }()
     
+    //Global var using HomePostModel
+    var HomePost:HomePostModel? {
+        didSet {
+            DispatchQueue.main.async {
+                
+                //gets url img
+                guard let pic_url_post = self.HomePost?.img_url else {return}
+                let urls = NSURL(string: pic_url_post)!
+                let datas = try? Data(contentsOf: urls as URL)
+                
+                //check if exist any data
+                if datas != nil {
+                    DispatchQueue.main.async {
+                        self.PostedImage.image = UIImage(data: datas!)
+                    }
+                }
+                
+                //profile image
+                
+                //passing username to view
+                self.UsernameLbl.text = self.HomePost?.users.username
+                
+                //output
+                let date_post = self.HomePost?.createAt.TimeAgoDisplay()
+                self.DateLbl.text = date_post
+                self.DateLbl.sizeToFit()
+                
+                //caption
+                self.CaptionPost.text = self.HomePost?.caption
+            }
+        }
+    }
+
+    
     
     //init cell view
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         //load and execute all function
         SettingObjects()
         SetupReactButton()
@@ -232,7 +263,7 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
             CaptionPost.topAnchor.constraint(equalTo: likeBtn.bottomAnchor, constant: 5),
             CaptionPost.leftAnchor.constraint(equalTo: ContainerView.leftAnchor),
             CaptionPost.rightAnchor.constraint(equalTo: ContainerView.rightAnchor),
-            CaptionPost.heightAnchor.constraint(equalToConstant: 100)
+            CaptionPost.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
     

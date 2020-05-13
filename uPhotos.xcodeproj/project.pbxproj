@@ -11,6 +11,7 @@
 		1F1C2C1C236B7E050028ABA8 /* NetworkingPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1C2C1B236B7E050028ABA8 /* NetworkingPost.swift */; };
 		1F36330B245E02250061A9E1 /* HomePostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F36330A245E02250061A9E1 /* HomePostModel.swift */; };
 		1F36330D245E08F60061A9E1 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F36330C245E08F60061A9E1 /* PostModel.swift */; };
+		1F36330F245E157E0061A9E1 /* TimeAgoDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F36330E245E157E0061A9E1 /* TimeAgoDisplay.swift */; };
 		1F41715E236661B30078DEA2 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F41715D236661B30078DEA2 /* SignInView.swift */; };
 		1F425B2424060EF100F6E3F1 /* InfoViewEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F425B2324060EF100F6E3F1 /* InfoViewEvent.swift */; };
 		1F425B272406254400F6E3F1 /* BlockScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F425B262406254400F6E3F1 /* BlockScreenController.swift */; };
@@ -57,6 +58,7 @@
 		1F1C2C1B236B7E050028ABA8 /* NetworkingPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingPost.swift; sourceTree = "<group>"; };
 		1F36330A245E02250061A9E1 /* HomePostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePostModel.swift; sourceTree = "<group>"; };
 		1F36330C245E08F60061A9E1 /* PostModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostModel.swift; path = ../../../../../../.Trash/PostModel.swift; sourceTree = "<group>"; };
+		1F36330E245E157E0061A9E1 /* TimeAgoDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgoDisplay.swift; sourceTree = "<group>"; };
 		1F41715D236661B30078DEA2 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		1F425B2324060EF100F6E3F1 /* InfoViewEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewEvent.swift; sourceTree = "<group>"; };
 		1F425B262406254400F6E3F1 /* BlockScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockScreenController.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 			children = (
 				1F425B262406254400F6E3F1 /* BlockScreenController.swift */,
 				1FED0342240A28A400223603 /* DetectConnection.swift */,
+				1F36330E245E157E0061A9E1 /* TimeAgoDisplay.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -513,6 +516,7 @@
 				1F36330B245E02250061A9E1 /* HomePostModel.swift in Sources */,
 				1FAD555323693CCA007A9B85 /* HeaderPics.swift in Sources */,
 				1FEE0EB22311F9A800EE1E29 /* HomeFeedController.swift in Sources */,
+				1F36330F245E157E0061A9E1 /* TimeAgoDisplay.swift in Sources */,
 				1FED0343240A28A400223603 /* DetectConnection.swift in Sources */,
 				1FEE0EB42311F9FB00EE1E29 /* SearchController.swift in Sources */,
 				1F77FC1E23C5855D00551E4A /* SearchModel.swift in Sources */,

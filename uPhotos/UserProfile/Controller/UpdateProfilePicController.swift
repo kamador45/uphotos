@@ -50,7 +50,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         btn.setImage(img?.withRenderingMode(.alwaysOriginal), for: .normal)
         btn.layer.zPosition = 1
         btn.clipsToBounds = true
-        btn.backgroundColor = UIColor.lightGray
+        btn.backgroundColor = .systemGray
         btn.layer.cornerRadius = 35/2
         btn.addTarget(self, action: #selector(UploadProfilePic), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -62,7 +62,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Username"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.lightGray
+        txt.textColor = .systemGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -72,7 +72,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Firstname"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.lightGray
+        txt.textColor = .systemGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -81,7 +81,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         let txt = UILabel()
         txt.text = "Lastname"
         txt.font = UIFont.boldSystemFont(ofSize: 18)
-        txt.textColor = UIColor.lightGray
+        txt.textColor = .systemGray
         txt.translatesAutoresizingMaskIntoConstraints = false
         return txt
     }()
@@ -89,6 +89,7 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
     let BioTextView: UITextView = {
         let tv = UITextView()
         tv.layer.borderColor = UIColor.lightGray.cgColor
+        tv.textColor = .systemGray
         tv.layer.borderWidth = 1
         tv.layer.cornerRadius = 7
         tv.isEditable = false
@@ -226,6 +227,8 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         //get current id in session
         guard let userId = currentUser!["id"] as? String else {return}
         
+        print(userId)
+        
         //define the url
         guard let url = URL(string: "\(serverURL)find/\(userId)") else {return}
         
@@ -256,6 +259,8 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
                             //insert objects in model
                             let parseJSON = UserModel(uid: id, dict: data_received as! [String:Any])
                             
+                            print(parseJSON)
+                            
                             //create url profile pic
                             let url_pp = parseJSON.path_pic
                             let urls = NSURL(string: url_pp)!
@@ -276,6 +281,10 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
                                 DispatchQueue.main.async {
                                     let img = UIImage(named: "user_avatar.png")
                                     self.Avatar.image = img
+                                    self.UsernameLbl.text = parseJSON.username
+                                    self.FirstnameLbl.text = parseJSON.first_name
+                                    self.LastnameLbl.text = parseJSON.last_name
+                                    self.BioTextView.text = parseJSON.bio
                                 }
                             }
                         }
@@ -334,7 +343,6 @@ class UpdateProfilePicController: UIViewController, UIImagePickerControllerDeleg
         }
         
         let filename = "profile.jpg"
-        
         let mimetype = "image/jpg"
         
         body.appendString(string: "--\(boundary)\r\n")

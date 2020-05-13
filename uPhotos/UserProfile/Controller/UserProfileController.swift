@@ -84,7 +84,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         ManageActionsControllers()
     }
     
-    //Chance enviroment when dark or light has been detected
+    //Change enviroment when dark or light has been detected
     @objc fileprivate func DetectEnviroment() {
         DispatchQueue.main.async {
             if #available(iOS 12, *) {
@@ -220,7 +220,6 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //define url
         guard let url = URL(string: "\(serverURL)find_posts/\(uid)") else {return}
-        print(url)
         
         //define process to download post
         URLSession.shared.dataTask(with: url) { (data, response, error) in

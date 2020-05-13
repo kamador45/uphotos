@@ -100,6 +100,9 @@ class CreatePostController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(CreatePost))
     }
     
+    //define notify name
+    static let Post_Made = NSNotification.Name("Post_Made")
+    
     //Create post
     @objc fileprivate func CreatePost() {
         
@@ -109,17 +112,16 @@ class CreatePostController: UIViewController {
         guard let uid = userData?.id else {return}
         guard let imageWidth = ImageToPost?.size.width else {return}
         guard let imageHeight = ImageToPost?.size.height else {return}
-        let createdAt = Date().timeIntervalSince1970 //Settings date in UNIX Format
-        
+
         //disable button
         navigationItem.rightBarButtonItem?.isEnabled = false
-        
+
         //Check data
         if !(uid).isEmpty || !(text).isEmpty || !(postImg.images)!.isEmpty || imageWidth != 0 || imageHeight != 0 {
-            
+
             //Load petition to make request to server
-            NetworkingPost.CreatePostNetwork(uid: uid, Caption: text, PostImg: postImg, ImageWidth: Int(imageWidth), ImageHeight: Int(imageHeight), created: createdAt)
-            
+            NetworkingPost.CreatePostNetwork(uid: uid, Caption: text, PostImg: postImg, ImageWidth: Int(imageWidth), ImageHeight: Int(imageHeight))
+
             //auto dissmis
             self.dismiss(animated: true, completion: nil)
         }

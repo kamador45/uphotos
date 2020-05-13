@@ -20,7 +20,7 @@ class NetworkingPost {
     }
     
     //Network request to create post
-    static func CreatePostNetwork(uid:String,Caption:String,PostImg:UIImage,ImageWidth:Int, ImageHeight:Int, created: TimeInterval) {
+    static func CreatePostNetwork(uid:String,Caption:String,PostImg:UIImage,ImageWidth:Int, ImageHeight:Int) {
         
         //Prepare url to server
         guard let url = URL(string: "\(serverURL)post/\(uid)") else {return}
@@ -45,7 +45,6 @@ class NetworkingPost {
             "caption":Caption,
             "imageWidth":ImageWidth,
             "imageHeight":ImageHeight,
-            "createdAt":created
         ] as [String:Any]
         
         print("Encontre esto ===> \(params)")

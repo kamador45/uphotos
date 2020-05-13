@@ -46,36 +46,41 @@ class NetworkingSignUp {
                     print("Oops something has been bad ==>\(err)")
                 } else {
                     do {
+                        
                         //cast to json
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
                         
                         //access to object and create session
-                        guard let id = json!["id"] as? String else {return}
+                        guard let parseJSON = json else {
+                            print("Error parsing JSON")
+                            return
+                        }
                         
-                        //convert diccionary to model
-                        let parseJSON = UserModel(uid: id, dict: json as! [String:Any])
+                        //Access to object
+                        let id = parseJSON["id"] as? String
                         
                         //detect if exist any data
-                        if !(id).isEmpty {
-                            print("I found this data ===>\(id)")
+                        if id != nil {
+                            //store value
+                            UserDefaults.standard.set(parseJSON, forKey: "parseJSON")
+                            currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
                             
-                            //Encode objects receive data from server
-                            UserDefaults.standard.set(try? PropertyListEncoder().encode(parseJSON), forKey: "parseJSON")
+                            //pass info to global var model
+                            userData = UserModel(uid: id!, dict: currentUser as! [String:Any])
                             
-                            //convert data to object
-                            guard let InfoDataUser = UserDefaults.standard.object(forKey: "parseJSON") as? Data else {return}
-                            
-                            //decode data to model
-                            guard let userInfo = try? PropertyListDecoder().decode(UserModel.self, from: InfoDataUser) else {return}
-                            
-                            //store info in global vat
-                            userData = userInfo
-                            
-                            //Create session
+                            //load home screen
                             DispatchQueue.main.async {
                                 appDelegates.Login()
                             }
+                        } else {
+                            DispatchQueue.main.async {
+                                let message = parseJSON["err"] as! String
+                                print("message")
+                                InfoViewEvent.ShowingMessage(message: message, color: .systemRed)
+                            }
                         }
+                        
+                        
                     } catch let errorJSON {
                         print("Oops something has been result bad ==>\(errorJSON)")
                     }
