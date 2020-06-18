@@ -77,126 +77,82 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         }
     }
     
+    //references
+    var filterUsrs = [UserModel]()
+    var users = [UserModel]()
+    
     //load all users
     fileprivate func ListAllUsers() {
-
-        //define url
+        print(users)
+        print(filterUsrs)
+        
+        //reference to download users
         guard let url = URL(string: "\(serverURL)list_users/") else {return}
-
-        //call networking services
+        
+        print(url)
+        
+        //networking services
         NetworkingSearch.getData(from: url) { (data, response, error) in
+            //detect if exist error
             if let err = error {
-                print("Opps something has been result bad ==>\(err)")
+                print("Oops something has been wrong ==>\(err)")
             } else {
                 do {
-                    //ensure get data value
+                    //gets data
                     guard let data = data else {return}
                     
-                    //cast to json
+                    //gets json and create dictionary
                     let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
                     
-                    //run every element
+                    //run objects
                     json?.forEach({ (data) in
                         
-                        //get key of data
+                        //Access to key
                         let key = data
                         
-                        //capture id key
+                        //gets id user
                         guard let id = key["id"] as? String else {return}
                         
-                        //compare between id users
-                        if userData?.id == id {
-                            print("Current user has been found ==>\(userData?.id ?? "")")
+                        //avoid user connected appear in UI
+                        if id == userData?.id {
+                            print("Se encontro al usuario en session")
                             return
                         }
                         
-                        //create new dictionary
-                        let listUsers = UserModel(uid: id, dict: key as! [String:Any])
-                        users.append(listUsers)
+                        //create dictionary
+                        guard let dict = key as? [String:Any] else {return}
+                        
+                        //Store info of user model
+                        let user = UserModel(uid: id, dict: dict)
+                        
+                        //insert data in array
+                        self.users.append(user)
                     })
                     
-                    //sorting users
-                    users.sort { (u1, u2) -> Bool in
+                    //sort users
+                    self.users.sort { (u1, u2) -> Bool in
                         return u1.username.compare(u2.username) == .orderedAscending
                     }
                     
-                    //assign value to new array
-                    filterUsers = users
+                    //store all users in array filter to do searchs
+                    self.filterUsrs = self.users
                     
+                    //reload collectionview
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
                     }
                     
                 } catch let errorJSON {
-                    print("Oops something has been result bad ==>\(errorJSON)")
+                    print("Oops error with errorJSON ==>\(errorJSON)")
                 }
             }
         }
         
-        //load networking services
-//        DispatchQueue.main.async {
-//            self.collectionView.reloadData()
-//        }
-
-        //network process
-//        URLSession.shared.dataTask(with: url) { (data, response, error) in
-//
-//            //detect any error
-//            if let err = error {
-//                print("Oops something has been result bad ==>\(err)")
-//            } else {
-//
-//                do {
-//                    //data
-//                    guard let data = data else {return}
-//
-//                    //cast to json
-//                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
-//
-//                    //running every value and key
-//                    json?.forEach({ (data) in
-//
-//                        //gets data
-//                        let key = data
-//
-//                        //capture id key
-//                        guard let id = key["id"] as? String else {return}
-//
-//                        //compare current user in session
-//                        if userData?.id == id {
-//                            print("usuario en sesion encontrado ==>\(userData?.id ?? "")")
-//                            return
-//                        }
-//
-//                        //creating new dictionary
-//                        let listUsers = UserModel(uid: id, dict: key as! [String : Any] )
-//                        self.users.append(listUsers)
-//                    })
-//
-//                    //sorting users
-//                    self.users.sort { (u1, u2) -> Bool in
-//                        return u1.username.compare(u2.username) == .orderedAscending
-//                    }
-//
-//                    //assign value to new array
-//                    self.filterUsers = self.users
-//
-//                    //reload collection view
-//                    DispatchQueue.main.async {
-//                        self.collectionView.reloadData()
-//                    }
-//
-//                } catch let errorJSON {
-//                    print("Oops something has been result bad with JSON ==>\(errorJSON)")
-//                }
-//            }
-//
-//        }.resume()
     }
     
     //settings collectionview cell
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filterUsers.count
+        return filterUsrs.count
     }
     
     //define indexpath
@@ -206,7 +162,7 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
         let celda = collectionView.dequeueReusableCell(withReuseIdentifier: celda_id, for: indexPath) as! SearchUsrCell
         
         //showing list users
-        celda.usersList = filterUsers[indexPath.item]
+        celda.usersList = filterUsrs[indexPath.item]
         
         //return cell
         return celda
@@ -215,14 +171,18 @@ class SearchController: UICollectionViewController, UICollectionViewDelegateFlow
     //Detect items selected
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        //Access to item position
-        let itemSelected = filterUsers[indexPath.item]
+        //get user selected
+        let userSelected = filterUsrs[indexPath.item]
+        print(userSelected)
         
-        //init controller
+        //Init collectionview controller
         let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
-        userProfileController.userId = itemSelected.id
-        navigationController?.pushViewController(userProfileController, animated: true)
         
+        //access to id of user selected
+        userProfileController.userId = userSelected.id
+        
+        //load controller
+        navigationController?.pushViewController(userProfileController, animated: true)
     }
     
     //Settings cells of collectionView
@@ -251,10 +211,10 @@ extension SearchController: UISearchResultsUpdating {
         
         //Detect if exist any data
         if text.isEmpty {
-            filterUsers = users
-            print(filterUsers)
+            filterUsrs = users
+            print(filterUsrs)
         } else {
-            filterUsers = users.filter({ (user) -> Bool in
+            filterUsrs = users.filter({ (user) -> Bool in
                 return user.username.lowercased().contains(text.lowercased())
             })
         }

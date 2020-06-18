@@ -135,24 +135,34 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
                     }
                 }
                 
-                //profile image
-                guard let p_profile_url = self.HomePost?.users?.path_pic else {return }
-                let urls_pp = NSURL(string: p_profile_url)!
-                let data_pp = try? Data(contentsOf: urls_pp as URL)
+                print(userData)
                 
-                //check if exist any data
-                if data_pp != nil {
+                //profile image
+                guard let pp_url = userData?.path_pic else {return} //self.HomePost?.users.path_pic else {return}
+                let url_pp = NSURL(string: pp_url)!
+                let data = try? Data(contentsOf: url_pp as URL)
+                
+                //Detect if exist data
+                if data != nil {
                     DispatchQueue.main.async {
-                        self.Avatar.image = UIImage(data: data_pp!)
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.Avatar.image = UIImage(named: "user_avatar.png")
+                        self.Avatar.image = UIImage(data: data!)
                     }
                 }
+//                DispatchQueue.global(qos: .background).async {
+//                    guard let pp_url = self.HomePost?.users.path_pic else {return}
+//                    let url_pp = NSURL(string: pp_url)!
+//                    let data = try? Data(contentsOf: url_pp as URL)
+//
+//                    //Detect if exist data
+//                    if data != nil {
+//                        DispatchQueue.main.async {
+//                            self.Avatar.image = UIImage(data: data!)
+//                        }
+//                    }
+//                }
                 
                 //passing username to view
-                self.UsernameLbl.text = self.HomePost?.users?.username
+                self.UsernameLbl.text = self.HomePost?.users.username
                 
                 //output
                 let date_post = self.HomePost?.createAt.TimeAgoDisplay()

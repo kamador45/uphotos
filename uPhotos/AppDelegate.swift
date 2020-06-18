@@ -16,7 +16,6 @@ var currentUser: NSDictionary?
 var guestUser: NSDictionary?
 let appDelegates: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 var infoViewShowing = false
-var filterUsers = [UserModel]()
 var users = [UserModel]()
 
 //global address to server
@@ -32,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //load data content send from server
         currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
-        
+
         if currentUser != nil {
             let id = currentUser!["id"] as? String
             userData = UserModel(uid: id!, dict: currentUser as! [String : Any])

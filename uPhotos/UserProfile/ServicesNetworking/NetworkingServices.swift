@@ -43,6 +43,7 @@ class NetworkingServices {
                         
                         //serialization of data
                         let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+
                         
                         DispatchQueue.main.async {
                             //getting every object from data
@@ -55,10 +56,13 @@ class NetworkingServices {
                                 guard let id = key["id"] as? String else {return}
                                 
                                 //creating new dictionary
-                                let userData = UserModel(uid: id, dict: key as! [String:Any])
+                                let usersData = UserModel(uid: id, dict: key as! [String:Any])
+                                DispatchQueue.main.async {
+                                    userData = UserModel(uid: id, dict: key as! [String:Any])
+                                }
                                 
                                 //assign value
-                                completion(userData)
+                                completion(usersData)
 
                             })
                         }

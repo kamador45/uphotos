@@ -30,6 +30,7 @@
 		1F97DB422369D96300DEB74D /* CreatePostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F97DB412369D96300DEB74D /* CreatePostController.swift */; };
 		1FAD554C236921CE007A9B85 /* NetworkingSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FAD554B236921CE007A9B85 /* NetworkingSignIn.swift */; };
 		1FAD555323693CCA007A9B85 /* HeaderPics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FAD555223693CCA007A9B85 /* HeaderPics.swift */; };
+		1FCE75AF249C214200265388 /* NetworkingHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE75AE249C214200265388 /* NetworkingHome.swift */; };
 		1FDA338523305F85006660A4 /* DownloadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA338423305F85006660A4 /* DownloadImage.swift */; };
 		1FDA3387233064EE006660A4 /* NetworkingServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA3386233064EE006660A4 /* NetworkingServices.swift */; };
 		1FE4A30F23C42802006C69C7 /* SearchUsrCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE4A30E23C42802006C69C7 /* SearchUsrCell.swift */; };
@@ -77,6 +78,7 @@
 		1F97DB412369D96300DEB74D /* CreatePostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostController.swift; sourceTree = "<group>"; };
 		1FAD554B236921CE007A9B85 /* NetworkingSignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingSignIn.swift; sourceTree = "<group>"; };
 		1FAD555223693CCA007A9B85 /* HeaderPics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderPics.swift; sourceTree = "<group>"; };
+		1FCE75AE249C214200265388 /* NetworkingHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingHome.swift; sourceTree = "<group>"; };
 		1FDA338423305F85006660A4 /* DownloadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadImage.swift; sourceTree = "<group>"; };
 		1FDA3386233064EE006660A4 /* NetworkingServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingServices.swift; sourceTree = "<group>"; };
 		1FE4A30E23C42802006C69C7 /* SearchUsrCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUsrCell.swift; sourceTree = "<group>"; };
@@ -180,6 +182,14 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		1FCE75AD249C212400265388 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				1FCE75AE249C214200265388 /* NetworkingHome.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		1FDA338323305F31006660A4 /* ServicesNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -270,6 +280,7 @@
 		1FEE0EAC2311F95600EE1E29 /* HomeFeed */ = {
 			isa = PBXGroup;
 			children = (
+				1FCE75AD249C212400265388 /* Networking */,
 				1F6049B2241F0B46008EC424 /* Controller */,
 				1F6049B1241F0B36008EC424 /* View */,
 				1F6049B0241F0B2B008EC424 /* Model */,
@@ -536,6 +547,7 @@
 				1F52806923C1A9EB00F8A4F6 /* CellPics.swift in Sources */,
 				1F5C340E23234BF600E2654A /* UpdateProfilePicController.swift in Sources */,
 				1FEE0EB82311FAC900EE1E29 /* NotifyController.swift in Sources */,
+				1FCE75AF249C214200265388 /* NetworkingHome.swift in Sources */,
 				1F41715E236661B30078DEA2 /* SignInView.swift in Sources */,
 				1F1C2C1C236B7E050028ABA8 /* NetworkingPost.swift in Sources */,
 				1F97DB422369D96300DEB74D /* CreatePostController.swift in Sources */,
@@ -702,7 +714,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = StandarteSoftware.com.uPhotos;
+				PRODUCT_BUNDLE_IDENTIFIER = standartesoftware;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -721,7 +733,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = StandarteSoftware.com.uPhotos;
+				PRODUCT_BUNDLE_IDENTIFIER = standartesoftware;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
