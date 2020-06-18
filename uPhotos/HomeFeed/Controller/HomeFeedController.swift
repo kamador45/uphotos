@@ -16,7 +16,7 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
     
     //receive id user
     var userId:String?
-    
+
     //creating refresh control
     var RefreshControl = UIRefreshControl()
     
@@ -95,7 +95,6 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         DispatchQueue.main.async {
             print("Hola Posts nuevos")
             self.ManageRefresh()
-            self.collectionView.reloadData()
         }
     }
     
@@ -104,6 +103,7 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         DispatchQueue.main.async {
             //execute download post function
             self.DownloadPosts()
+            self.Posts.removeAll()
             
             //executing refresh control
             self.collectionView.refreshControl = self.RefreshControl
@@ -147,6 +147,9 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         return CGSize(width: view.frame.width, height: height)
     }
     
+    //refresh
+    let refreshController = UIRefreshControl()
+    
     //Create post array
     var Posts = [HomePostModel]()
     
@@ -159,12 +162,23 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         //define url like references
         guard let url = URL(string: "\(serverURL)feed_posts/\(uid)") else {return}
         
+        print(url)
+        
         //defining process to download posts
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             do {
                 
                 //ensure data
                 guard let data = data else {return}
+                
+                //finish refresh
+                if #available(iOS 10.0, *) {
+                    DispatchQueue.main.async {
+                        self.collectionView.refreshControl?.endRefreshing()
+                    }
+                } else {
+                    self.collectionView.addSubview(self.refreshController)
+                }
                 
                 //gets JSON objects
                 let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
@@ -178,8 +192,6 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
                     //gets key of every object
                     guard let details = key["details"] else {return}
                     
-                    print(details)
-                    
                     //insert all post in model
                     let post = HomePostModel(user: userData!, uid: uid, dictPost: details as! [String:Any])
                     
@@ -187,9 +199,12 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
                     self.Posts.append(post)
                 })
                 
-                //sorting objects
-                self.Posts.reverse()
-                
+
+                //sort post
+                self.Posts.sort { (p1, p2) -> Bool in
+                    return p1.createAt.compare(p2.createAt) == .orderedDescending
+                }
+            
                 //update UI
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()

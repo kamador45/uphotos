@@ -105,6 +105,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     @objc fileprivate func Fetch() {
         DispatchQueue.main.async {
             self.ManageRefresh()
+            self.DownloadPostUsr()
             self.collectionView.reloadData()
         }
     }
@@ -112,6 +113,8 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     @objc fileprivate func ManageRefresh() {
         DispatchQueue.main.async {
             self.DescargaUsrInfo()
+            self.PostByUsr.removeAll()
+            self.DownloadPostUsr()
             self.collectionView.refreshControl = self.RefreshControl
             self.RefreshControl.endRefreshing()
         }
@@ -220,41 +223,49 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //define url
         guard let url = URL(string: "\(serverURL)find_posts/\(uid)") else {return}
+        print("Encontre esto ==>\(url)")
         
-        //define process to download post
+        //define network process
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             do {
                 //ensure data
                 guard let data = data else {return}
-
-                //cast to json
+                
+                //gets JSON objects
                 let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
-
-                //run every element
+                
+                // run all objects
                 json?.forEach({ (data) in
                     
-                    //gets data
-                    let key = data
+                    //Access to key
+                    let keys = data
                     
-                    //gets key of every post
-                    guard let details = key["details"] else {return}
+                    //access to value
+                    guard let details = keys["details"] else {return}
                     
-                    //Insert every element in post model
-                    let post = PostModel(uid: uid, dictPost: details as! [String : Any])
+                    print(details)
                     
-                    //Insert element in array
+                    //insert all post in model
+                    let post = PostModel(user: userData!, uid: uid, dict: details as! [String:Any])
+                    
+                    //insert all post in array
                     self.PostByUsr.append(post)
                 })
                 
-                //sorting post array
-                self.PostByUsr.reverse()
-
+                print(self.PostByUsr)
+                
+                //sorting post made by user
+                self.PostByUsr.sort { (p1, p2) -> Bool in
+                    return p1.postDate.compare(p2.postDate) == .orderedDescending
+                }
+                
+                //update UI
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                 }
-
+                
             } catch let errorJSON {
-                print("Oops something has been result bad ==>\(errorJSON)")
+                print("Oops JSON objects error ==> \(errorJSON)")
             }
         }.resume()
     }

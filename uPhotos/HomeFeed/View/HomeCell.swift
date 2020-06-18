@@ -136,9 +136,23 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
                 }
                 
                 //profile image
+                guard let p_profile_url = self.HomePost?.users?.path_pic else {return }
+                let urls_pp = NSURL(string: p_profile_url)!
+                let data_pp = try? Data(contentsOf: urls_pp as URL)
+                
+                //check if exist any data
+                if data_pp != nil {
+                    DispatchQueue.main.async {
+                        self.Avatar.image = UIImage(data: data_pp!)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.Avatar.image = UIImage(named: "user_avatar.png")
+                    }
+                }
                 
                 //passing username to view
-                self.UsernameLbl.text = self.HomePost?.users.username
+                self.UsernameLbl.text = self.HomePost?.users?.username
                 
                 //output
                 let date_post = self.HomePost?.createAt.TimeAgoDisplay()

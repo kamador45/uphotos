@@ -35,7 +35,7 @@ class ProfilePostUsrCell: UICollectionViewCell {
             DispatchQueue.main.async {
                 
                 //download and set pics posted
-                guard let pic_url_post = self.PostData?.img_url else {return}
+                guard let pic_url_post = self.PostData?.img_url else {return} //self.PostData?.img_url else {return}
                 let urls = NSURL(string: pic_url_post)!
                 let datas = try? Data(contentsOf: urls as URL)
                 
