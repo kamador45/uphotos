@@ -75,21 +75,21 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
     lazy var likeBtn: UIButton = {
         let btn = UIButton(type: .system)
         let img = UIImage(named: "un_heart.png")
-        btn.setImage(img?.withRenderingMode(.alwaysOriginal), for: .normal)
+        btn.setImage(img, for: .normal)
         return btn
     }()
     
     lazy var CommentsBtn: UIButton = {
         let btn = UIButton(type: .system)
         let img = UIImage(named: "comments.png")
-        btn.setImage(img?.withRenderingMode(.alwaysOriginal), for: .normal)
+        btn.setImage(img, for: .normal)
         return btn
     }()
     
     lazy var ShareBtn: UIButton = {
         let btn = UIButton(type: .system)
         let img = UIImage(named: "share.png")
-        btn.setImage(img?.withRenderingMode(.alwaysOriginal), for: .normal)
+        btn.setImage(img, for: .normal)
         return btn
     }()
     
@@ -135,8 +135,6 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
                     }
                 }
                 
-                print(userData)
-                
                 //profile image
                 guard let pp_url = userData?.path_pic else {return} //self.HomePost?.users.path_pic else {return}
                 let url_pp = NSURL(string: pp_url)!
@@ -148,18 +146,6 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
                         self.Avatar.image = UIImage(data: data!)
                     }
                 }
-//                DispatchQueue.global(qos: .background).async {
-//                    guard let pp_url = self.HomePost?.users.path_pic else {return}
-//                    let url_pp = NSURL(string: pp_url)!
-//                    let data = try? Data(contentsOf: url_pp as URL)
-//
-//                    //Detect if exist data
-//                    if data != nil {
-//                        DispatchQueue.main.async {
-//                            self.Avatar.image = UIImage(data: data!)
-//                        }
-//                    }
-//                }
                 
                 //passing username to view
                 self.UsernameLbl.text = self.HomePost?.users.username
@@ -289,6 +275,33 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
             CaptionPost.rightAnchor.constraint(equalTo: ContainerView.rightAnchor),
             CaptionPost.heightAnchor.constraint(equalToConstant: 70)
         ])
+    }
+    
+    //setup UI when light it's enable
+    func AdaptCellToLight() {
+        //define new colors
+        Avatar.layer.borderColor = UIColor.black.cgColor
+        UsernameLbl.textColor = .black
+        DateLbl.textColor = .lightGray
+        OptionsBtn.titleLabel?.textColor = .black
+        CaptionPost.textColor = .black
+        likeBtn.tintColor = .black
+        CommentsBtn.tintColor = .black
+        ShareBtn.tintColor = .black
+    }
+    
+    //setup UI when dark it's enable
+    func AdaptCellToDark() {
+        //define new colors
+        Avatar.layer.borderColor = UIColor.white.cgColor
+        UsernameLbl.textColor = .white
+        DateLbl.textColor = .lightGray
+        CaptionPost.textColor = .white
+        CaptionPost.backgroundColor = .black
+        ContainerView.backgroundColor = .black
+        likeBtn.tintColor = .white
+        CommentsBtn.tintColor = .white
+        ShareBtn.tintColor = .white
     }
     
     //manage error event

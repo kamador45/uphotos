@@ -33,10 +33,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
 
         if currentUser != nil {
-            let id = currentUser!["id"] as? String
-            userData = UserModel(uid: id!, dict: currentUser as! [String : Any])
-            if id != nil {
-                Login()
+            DispatchQueue.main.async {
+                let id = currentUser!["id"] as? String
+                if id != nil {
+                    self.CheckStatusUsr(id: id!)
+                }
             }
         }
         
@@ -48,6 +49,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func Login() {
         let controller = MainTabBarController()
         window?.rootViewController = controller
+    }
+    
+    //try to check if status user is active or not
+    func CheckStatusUsr(id:String) {
+        
+        //define url
+        guard let url = URL(string: "\(serverURL)status_usr/\(id)") else {return}
+        
+        //load networking services
+        NetworkingServices.getData(from: url) { (data, response, error) in
+            if let err = error {
+                print("Oops something has been bad ==>\(err)")
+            } else {
+                do {
+                    guard let data = data else {
+                        return
+                    }
+                    
+                    //gets json
+                    let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
+                    
+                    //run every element of array
+                    json?.forEach({ (data) in
+                        
+                        //store data
+                        let state = data
+                        
+                        //access to value
+                        guard let prueba = state as? [String:Any] else {return}
+                        let x = prueba["status"] as? String
+                        
+                        if x != "ACTIVE" {
+                            DispatchQueue.global(qos: .background).async {
+                                UserDefaults.standard.removeObject(forKey: "parseJSON")
+                                UserDefaults.standard.synchronize()
+                            }
+                        } else {
+                            DispatchQueue.main.async {
+                                userData = UserModel(uid: id, dict: currentUser as! [String : Any])
+                                self.Login()
+                            }
+                        }
+                    })
+                    
+                }
+            }
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

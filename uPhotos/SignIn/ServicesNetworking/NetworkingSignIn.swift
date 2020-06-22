@@ -59,29 +59,38 @@ class NetworkingSignIn {
                         }
                         
                         //Access to object to data
+                        let status = parseJSON["status"] as? String
                         let id = parseJSON["id"] as? String
                         
-                        //detect if exist some data
-                        if id != nil {
-                            
-                            print("I found this info ==>\(id ?? "")")
-                            
-                            //store value
-                            UserDefaults.standard.set(parseJSON, forKey: "parseJSON")
-                            currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
-                            
-                            //test
-                            userData = UserModel(uid: id!, dict: currentUser as! [String : Any])
-                            
-                            //load home screen
+                        if status != "ACTIVE" {
                             DispatchQueue.main.async {
-                                appDelegates.Login()
+                                //Show message if user does not exist
+                                let msg = parseJSON["err"] as! String
+                                InfoViewEvent.ShowingMessage(message: msg, color: .systemRed)
                             }
                         } else {
-                            DispatchQueue.main.async {
-                                let message = parseJSON["err"] as! String
-                                print(message)
-                                InfoViewEvent.ShowingMessage(message: message, color: .systemRed)
+                            //detect if exist some data
+                            if id != nil {
+                                
+                                print("I found this info ==>\(id ?? "")")
+                                
+                                //store value
+                                UserDefaults.standard.set(parseJSON, forKey: "parseJSON")
+                                currentUser = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
+                                
+                                //test
+                                userData = UserModel(uid: id!, dict: currentUser as! [String : Any])
+                                
+                                //load home screen
+                                DispatchQueue.main.async {
+                                    appDelegates.Login()
+                                }
+                            } else {
+                                DispatchQueue.main.async {
+                                    let message = parseJSON["err"] as! String
+                                    print(message)
+                                    InfoViewEvent.ShowingMessage(message: message, color: .systemRed)
+                                }
                             }
                         }
                     } catch let errorJSON {

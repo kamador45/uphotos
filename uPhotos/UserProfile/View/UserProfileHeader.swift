@@ -443,18 +443,18 @@ class UserProfileHeader: UICollectionViewCell, UIImagePickerControllerDelegate {
     //this function try to adapt interface
     func AdaptHeadertoDark() {
         //define new colors when dark mode it's active
-        Avatar.layer.borderColor = UIColor.black.cgColor
-        FullnameLbl.textColor = .systemPink
-        UsernameLbl.textColor = .systemPink
-        BioLbl.textColor = .systemPink
-        LikesLbl.textColor = .systemPink
-        FollowersLbl.textColor = .systemPink
-        FollowingLbl.textColor = .systemPink
-        CollectionPicLbl.textColor = .systemPink
-        GridBtn.tintColor = .systemPink
-        ListBtn.tintColor = .systemPink
-        FollowUsr.tintColor = .systemPink
-        FollowUsr.layer.borderColor = UIColor.systemPink.cgColor
+        Avatar.layer.borderColor = UIColor.white.cgColor
+        FullnameLbl.textColor = .white
+        UsernameLbl.textColor = .white
+        BioLbl.textColor = .white
+        LikesLbl.textColor = .lightGray
+        FollowersLbl.textColor = .lightGray
+        FollowingLbl.textColor = .lightGray
+        CollectionPicLbl.textColor = .white
+        GridBtn.tintColor = .white
+        ListBtn.tintColor = .white
+        FollowUsr.tintColor = .white
+        FollowUsr.layer.borderColor = UIColor.white.cgColor
     }
     
     //check follow button

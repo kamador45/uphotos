@@ -122,8 +122,23 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         //creating cell
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cell_id, for: indexPath) as! HomeCell
         
+        //detect envirotment
+        DispatchQueue.main.async {
+            if #available(iOS 12, *) {
+                if self.traitCollection.userInterfaceStyle == .light {
+                    self.collectionView.backgroundColor = .white
+                    cell.AdaptCellToLight()
+                } else {
+                    self.collectionView.backgroundColor = .black
+                    cell.AdaptCellToDark()
+                }
+            }
+        }
+        
         //Pass data to cell
-        cell.HomePost = Posts[indexPath.item]
+        DispatchQueue.main.async {
+            cell.HomePost = self.Posts[indexPath.item]
+        }
         
         //returning cell
         return cell
@@ -206,62 +221,6 @@ class HomeFeedController: UICollectionViewController, UICollectionViewDelegateFl
         NetworkingServices.DownloadMainInfoUsr(uid: uid) { (user) in
             self.DownloadPostWithUsr(user: user)
         }
-        
-//
-//        //define url like references
-//
-//        print(url)
-//
-//        //defining process to download posts
-//        URLSession.shared.dataTask(with: url) { (data, response, error) in
-//            do {
-//
-//                //ensure data
-//                guard let data = data else {return}
-//
-//                //finish refresh
-//                if #available(iOS 10.0, *) {
-//                    DispatchQueue.main.async {
-//                        self.collectionView.refreshControl?.endRefreshing()
-//                    }
-//                } else {
-//                    self.collectionView.addSubview(self.refreshController)
-//                }
-//
-//                //gets JSON objects
-//                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [NSDictionary]
-//
-//                //run every object
-//                json?.forEach({ (data) in
-//
-//                    //gets data
-//                    let key = data
-//
-//                    //gets key of every object
-//                    guard let details = key["details"] else {return}
-//
-//                    //insert all post in model
-//                    let post = HomePostModel(user: userData!, uid: uid, dictPost: details as! [String:Any])
-//
-//                    //insert all post in array
-//                    self.Posts.append(post)
-//                })
-//
-//
-//                //sort post
-//                self.Posts.sort { (p1, p2) -> Bool in
-//                    return p1.createAt.compare(p2.createAt) == .orderedDescending
-//                }
-//
-//                //update UI
-//                DispatchQueue.main.async {
-//                    self.collectionView.reloadData()
-//                }
-//
-//            } catch let errorJSON {
-//                print("Oops something has been resulted bad with JSON ==> \(errorJSON)")
-//            }
-//        }.resume()
     }
     
     //definig status bar style
