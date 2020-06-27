@@ -45,7 +45,7 @@ class HomeCell: UICollectionViewCell, UIScrollViewDelegate {
         lbl.font = UIFont.boldSystemFont(ofSize: 20)
         lbl.layer.zPosition = 1
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "@kamador94"
+        lbl.text = "@username"
         return lbl
     }()
     
