@@ -135,32 +135,32 @@ class UploadPicController: UICollectionViewController, UICollectionViewDelegateF
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
+        let fetchResults = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        
         //check data from carrete
-        if let fetchResults: PHFetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions) {
-            //check that to it major of zero
-            if fetchResults.count > 0 {
-                for i in 0..<fetchResults.count {
-                    let assets = fetchResults.object(at: i)
+        //check that to it major of zero
+        if fetchResults.count > 0 {
+            for i in 0..<fetchResults.count {
+                let assets = fetchResults.object(at: i)
 
-                    imgManager.requestImage(for: fetchResults.object(at: i), targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { (image, err) in
-                        if let images = image {
-                            //insert object in assets array
-                            self.assets.append(assets)
-                            self.ImageArray.append(images)
+                imgManager.requestImage(for: fetchResults.object(at: i), targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { (image, err) in
+                    if let images = image {
+                        //insert object in assets array
+                        self.assets.append(assets)
+                        self.ImageArray.append(images)
 
-                            if self.ImageSelected == nil {
-                                self.ImageSelected = images
-                            }
-
-                            self.collectionView.reloadData()
+                        if self.ImageSelected == nil {
+                            self.ImageSelected = images
                         }
+
+                        self.collectionView.reloadData()
                     }
                 }
-            } else {
-                print("not picture found")
-                DownloadAllPictures()
-                self.collectionView.reloadData()
             }
+        } else {
+            print("not picture found")
+            DownloadAllPictures()
+            self.collectionView.reloadData()
         }
     }
     
